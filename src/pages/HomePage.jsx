@@ -16,12 +16,12 @@ function HomePage() {
             Excellence in Surveying Since 1985
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-2xl md:text-4xl font-bold text-white mb-6 leading-tight">
             <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
               NIGERIAN ASSOCIATION OF SURVEY TECHNICIAN 
             </span>
             <br />
-            <span className="text-white">N.A.S.T IFO ZONE</span>
+            <span className="text-white">N.A.S.T IFO ZONE</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl leading-relaxed">
