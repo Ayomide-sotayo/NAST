@@ -56,7 +56,7 @@ const HeroSection = () => {
         </div>
 
         {/* Main Title */}
-        <div className="mb-8 space-y-4">
+        <div className="mb-8 space-y-4 libre-baskerville-bold">
           <h1 className="text-2xl md:text-4xl lg:text-4xl font-black text-white leading-tight">
             <span className="block mb-2">
               <span className="bg-gradient-to-r from-teal-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
