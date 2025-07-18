@@ -1,54 +1,13 @@
 import HeroSection from "../components/HeroSection";
+import StatsSection from "../components/StatsSection";
 
 function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* hero section */}
      <HeroSection />
-      {/* Stats Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-teal-400 to-blue-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
-                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z"/>
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-2">500+</h3>
-              <p className="text-gray-600">Active Members</p>
-            </div>
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
-                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-2">38</h3>
-              <p className="text-gray-600">Years of Excellence</p>
-            </div>
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
-                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12S6.48 22 12 22 22 17.52 22 12 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"/>
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-2">1000+</h3>
-              <p className="text-gray-600">Projects Completed</p>
-            </div>
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:scale-110">
-                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L15.09 8.26L22 9L15.09 9.74L12 16L8.91 9.74L2 9L8.91 8.26L12 2Z"/>
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-slate-900 mb-2">36</h3>
-              <p className="text-gray-600">States Covered</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
+     {/* stats section */}
+     <StatsSection />
       {/* About Section with Split Layout */}
       <section className="py-20 bg-slate-50">
         <div className="container mx-auto px-6">

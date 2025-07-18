@@ -3,7 +3,7 @@ import logo from "../assets/logo.png";
 
 function Navbar() {
   return (
-    <nav className="bg-slate-900 text-white shadow-lg border-b-2 border-teal-400">
+    <nav className="bg-slate-900 text-white shadow-lg border-b-2 border-teal-400 fixed z-100 w-full">
       <div className="container mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           {/* Logo Section */}

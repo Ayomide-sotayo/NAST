@@ -48,16 +48,16 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-black/50 z-10" />
 
       {/* Content */}
-      <div className="relative z-20 container mx-auto px-6 py-20 flex flex-col items-center justify-center min-h-screen text-center">
+      <div className="relative z-20 container mx-auto px-6 py-30 flex flex-col items-center justify-center min-h-screen text-center">
         {/* Floating Badge */}
-        <div className="mb-12 inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-teal-300 text-sm font-medium animate-pulse">
+        <div className="mb-7 inline-flex items-center px-6 py-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-teal-300 text-sm font-medium animate-pulse">
           <span className="w-2 h-2 bg-teal-400 rounded-full mr-3 animate-pulse"></span>
           Excellence in Surveying Since 1985
         </div>
 
         {/* Main Title */}
         <div className="mb-8 space-y-4">
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight">
+          <h1 className="text-2xl md:text-4xl lg:text-4xl font-black text-white leading-tight">
             <span className="block mb-2">
               <span className="bg-gradient-to-r from-teal-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
                 NIGERIAN ASSOCIATION
@@ -68,7 +68,7 @@ const HeroSection = () => {
                 OF SURVEY TECHNICIAN
               </span>
             </span>
-            <span className="block text-3xl md:text-4xl lg:text-5xl font-bold text-white/90 mt-6 tracking-wider">
+            <span className="block text-2xl md:text-3xl lg:text-4xl font-bold text-white/90 mt-6 tracking-wider">
               N.A.S.T IFO ZONE
             </span>
           </h1>
@@ -76,40 +76,12 @@ const HeroSection = () => {
 
         {/* Subtitle */}
         <div className="mb-16 max-w-4xl">
-          <p className="text-xl md:text-2xl lg:text-3xl text-gray-200 leading-relaxed font-light tracking-wide">
+          <p className="text-xl md:text-xl lg:text-2xl text-gray-200 leading-relaxed font-light tracking-wide">
             Leading excellence in surveying across Nigeria with{" "}
             <span className="text-teal-400 font-medium">precision</span>,{" "}
             <span className="text-blue-400 font-medium">innovation</span>, and{" "}
             <span className="text-cyan-400 font-medium">integrity</span>.
           </p>
-        </div>
-
-        {/* Stats Section */}
-        <div className="mb-16 grid grid-cols-3 gap-8 max-w-2xl">
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-teal-400 mb-2">
-              500+
-            </div>
-            <div className="text-sm md:text-base text-gray-300">
-              Active Members
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-blue-400 mb-2">
-              38+
-            </div>
-            <div className="text-sm md:text-base text-gray-300">
-              Years Experience
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-cyan-400 mb-2">
-              1000+
-            </div>
-            <div className="text-sm md:text-base text-gray-300">
-              Projects Completed
-            </div>
-          </div>
         </div>
 
         {/* CTA Buttons */}
@@ -143,13 +115,6 @@ const HeroSection = () => {
             }`}
           />
         ))}
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
-        <div className="w-6 h-10 border-2 border-white/40 rounded-full flex justify-center backdrop-blur-sm">
-          <div className="w-1 h-3 bg-white/80 rounded-full mt-2 animate-pulse"></div>
-        </div>
       </div>
 
       {/* Custom CSS for animations */}
