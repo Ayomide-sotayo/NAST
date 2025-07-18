@@ -1,64 +1,10 @@
+import HeroSection from "../components/HeroSection";
+
 function HomePage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
-      {/* Hero Section with Glassmorphism */}
-      <section className="relative min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-teal-600/20"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}></div>
-        
-        <div className="relative z-10 container mx-auto px-6 py-20 flex flex-col items-center justify-center min-h-screen text-center">
-          {/* Floating Badge */}
-          <div className="mb-8 inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20 text-teal-300 text-sm font-medium">
-            <span className="w-2 h-2 bg-teal-400 rounded-full mr-2 animate-pulse"></span>
-            Excellence in Surveying Since 1985
-          </div>
-          
-          <h1 className="text-2xl md:text-4xl font-bold text-white mb-6 leading-tight">
-            <span className="bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent">
-              NIGERIAN ASSOCIATION OF SURVEY TECHNICIAN 
-            </span>
-            <br />
-            <span className="text-white">N.A.S.T IFO ZONE</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl leading-relaxed">
-            Leading excellence in surveying across Nigeria with precision, innovation, and integrity.
-          </p>
-          
-          {/* Hero Image with 3D Effect */}
-          <div className="relative mb-12 group">
-            <div className="absolute -inset-4 bg-gradient-to-r from-teal-400 to-blue-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-500"></div>
-            <img
-              src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-              alt="Professional surveyor with equipment"
-              className="relative w-full max-w-4xl h-96 object-cover rounded-2xl shadow-2xl transform group-hover:scale-105 transition duration-500"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-2xl"></div>
-          </div>
-          
-          {/* CTA Buttons */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <a href="/contact" className="group relative px-8 py-4 bg-teal-400 text-slate-900 font-bold rounded-full hover:bg-teal-300 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <span className="relative z-10">Join Our Community</span>
-              <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </a>
-            <a href="/members" className="group px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-full border border-white/20 hover:bg-white/20 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              Explore Services
-            </a>
-          </div>
-        </div>
-        
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-pulse"></div>
-          </div>
-        </div>
-      </section>
-
+      {/* hero section */}
+     <HeroSection />
       {/* Stats Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-6">
