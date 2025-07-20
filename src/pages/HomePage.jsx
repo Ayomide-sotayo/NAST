@@ -2,7 +2,7 @@ import HeroSection from "../components/HeroSection";
 import MissionSection from "../components/MissionSection";
 import StatsSection from "../components/StatsSection";
 import nast4 from "../assets/nast4.jpg"
-import CTASection from "../components/CtaSection";
+import CTASection from "../components/CTASection.jsx";
 
 function HomePage() {
   return (
