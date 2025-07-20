@@ -102,7 +102,7 @@ const MissionSection = () => {
         
         {/* Bottom CTA */}
         <div className="text-center mt-20">
-          <div className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-full shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-2 hover:scale-105">
+          <div className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-emerald-600 via-green-500 to-lime-500 bg-clip-text text-transparent rounded-full shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:-translate-y-2 hover:scale-105">
             <Users className="w-5 h-5 mr-2" />
             <span className="text-lg">Be Part of Our Mission</span>
           </div>
