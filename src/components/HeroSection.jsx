@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
+import nast1 from "../assets/nast1.jpg";
+import nast2 from "../assets/nast2.jpg";
+import nast3 from "../assets/nast3.jpg";
+import nast4 from "../assets/nast4.jpg";
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Background images for carousel
-  const backgroundImages = [
-    "https://images.unsplash.com/photo-1581092160562-40aa08e78837?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-    "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
-  ];
+  const backgroundImages = [nast1, nast2, nast3, nast4];
 
   // Auto-play carousel
   useEffect(() => {
@@ -41,15 +40,18 @@ const HeroSection = () => {
 
       {/* Enhanced Dark Overlay with Gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-black/50 z-10" />
-      
+
       {/* Green Accent Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/30 via-transparent to-green-800/20 z-10" />
 
       {/* Subtle Pattern Overlay */}
       <div className="absolute inset-0 z-10 opacity-5">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='m0 40l40-40h-40v40zm40 0v-40h-40l40 40z'/%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
       </div>
 
       {/* Slide Indicators */}
@@ -59,8 +61,8 @@ const HeroSection = () => {
             key={index}
             onClick={() => setCurrentSlide(index)}
             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide 
-                ? "bg-emerald-400 shadow-lg shadow-emerald-400/50" 
+              index === currentSlide
+                ? "bg-emerald-400 shadow-lg shadow-emerald-400/50"
                 : "bg-white/40 hover:bg-white/60"
             }`}
           />
@@ -102,8 +104,12 @@ const HeroSection = () => {
               <div className="space-y-4">
                 <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 leading-relaxed font-light max-w-2xl mx-auto lg:mx-0">
                   Leading excellence in surveying across Nigeria with{" "}
-                  <span className="text-emerald-400 font-medium">precision</span>,{" "}
-                  <span className="text-green-400 font-medium">innovation</span>, and{" "}
+                  <span className="text-emerald-400 font-medium">
+                    precision
+                  </span>
+                  ,{" "}
+                  <span className="text-green-400 font-medium">innovation</span>
+                  , and{" "}
                   <span className="text-lime-400 font-medium">integrity</span>.
                 </p>
               </div>
@@ -114,7 +120,9 @@ const HeroSection = () => {
                   href="/contact"
                   className="group relative px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-full hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-2xl hover:shadow-emerald-500/40 transform hover:-translate-y-1 hover:scale-105 active:scale-95"
                 >
-                  <span className="relative z-10 text-base sm:text-lg">Join Our Community</span>
+                  <span className="relative z-10 text-base sm:text-lg">
+                    Join Our Community
+                  </span>
                   <div className="absolute inset-0 bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>
                 <a
@@ -141,7 +149,9 @@ const HeroSection = () => {
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-lime-400 rounded-full"></div>
                   </div>
                   <div className="w-32 h-32 bg-gradient-to-br from-emerald-400/20 to-green-400/20 rounded-full backdrop-blur-sm border border-emerald-400/30 flex items-center justify-center">
-                    <div className="text-2xl font-bold text-emerald-400">N.A.S.T</div>
+                    <div className="text-2xl font-bold text-emerald-400">
+                      N.A.S.T
+                    </div>
                   </div>
                 </div>
               </div>
@@ -152,35 +162,56 @@ const HeroSection = () => {
 
       {/* Custom CSS for animations */}
       <style jsx>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
-        
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap");
+
         * {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+          font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+            "Roboto", sans-serif;
         }
 
         .font-mono {
-          font-family: 'JetBrains Mono', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+          font-family: "JetBrains Mono", "SF Mono", Monaco, "Cascadia Code",
+            "Roboto Mono", Consolas, "Courier New", monospace;
         }
 
         @keyframes zoomEffect {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
 
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
         }
 
         @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         @keyframes spin-reverse {
-          from { transform: rotate(360deg); }
-          to { transform: rotate(0deg); }
+          from {
+            transform: rotate(360deg);
+          }
+          to {
+            transform: rotate(0deg);
+          }
         }
 
         .animate-float {
