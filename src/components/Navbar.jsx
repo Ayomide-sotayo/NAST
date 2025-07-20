@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import logo from "../assets/logo.png"
-// import {Link} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,10 +20,7 @@ function Navbar() {
   // Navigation items
   const navItems = [
     { to: "/", label: "Home" },
-    { to: "/about", label: "About" },
     { to: "/members", label: "Members" },
-    { to: "/services", label: "Services" },
-    { to: "/gallery", label: "Gallery" },
     { to: "/contact", label: "Contact" },
   ];
 
@@ -39,8 +36,8 @@ function Navbar() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 lg:h-20">
             {/* Logo Section */}
-            <a
-              href="/"
+            <Link
+              to="/"
               className="flex items-center space-x-3 hover:opacity-90 transition-all duration-300 transform hover:scale-105"
             >
               <div className="relative">
@@ -58,20 +55,20 @@ function Navbar() {
                   Survey Excellence
                 </span>
               </div>
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-1">
               {navItems.map((item) => (
-                <a
+                <Link
                   key={item.to}
-                  href={item.to}
+                  to={item.to}
                   className="relative px-4 py-2 rounded-lg text-gray-200 hover:text-white transition-all duration-300 group overflow-hidden"
                 >
                   <span className="relative z-10 font-medium">{item.label}</span>
                   <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-400/10 to-green-500/0 opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-x-0 group-hover:scale-x-100"></div>
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-emerald-400 to-green-400 group-hover:w-full transition-all duration-300"></div>
-                </a>
+                </Link>
               ))}
             </div>
 
