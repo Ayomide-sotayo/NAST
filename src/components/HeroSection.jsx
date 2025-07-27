@@ -70,7 +70,7 @@ const HeroSection = () => {
       </div>
 
       {/* Content Container */}
-      <div className="relative z-20 min-h-screen flex py-8 px-4 md:px-6 lg:px-8">
+      <div className="relative z-20 min-h-screen flex py-6 px-4 md:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left Content */}
@@ -113,7 +113,6 @@ const HeroSection = () => {
                   <span className="text-lime-400 font-medium">integrity</span>.
                 </p>
               </div>
-
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6 justify-center lg:justify-start">
                 <a
