@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Users,
   MessageSquare,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import MemberIDCard from "../../components/MemberIDCard.jsx";
+import { supabase } from '../../supabaseClient.js';
 
 function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState("members");
@@ -25,9 +26,13 @@ function AdminDashboard({ onLogout }) {
   const [editingMember, setEditingMember] = useState(null);
   const [showIdCard, setShowIdCard] = useState(false);
   const [idCardMember, setIdCardMember] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const idCardRef = useRef(null);
 
-  // Login form data
+  // New member form data
   const [newMember, setNewMember] = useState({
     name: "",
     email: "",
@@ -36,145 +41,171 @@ function AdminDashboard({ onLogout }) {
     role: "Junior Surveyor",
     specialization: "",
     avatar: "",
+    status: "Active",
+    license_number: "",
+    blood_group: "",
+    years_experience: 0,
+    rating: 0,
+    projects_completed: 0
   });
 
-  // Sample members data
-  const [members, setMembers] = useState([
-    {
-      id: "NAST001",
-      name: "John Adebayo",
-      email: "john.adebayo@nastnigeria.org",
-      phone: "+234 801 234 5678",
-      location: "Lagos State",
-      role: "Senior Surveyor",
-      specialization: "Land Surveying",
-      status: "Active",
-      joinDate: "2020-01-15",
-      licenseNumber: "SUR/LAG/2020/001",
-      avatar:
-        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-    },
-    {
-      id: "NAST002",
-      name: "Amaka Okeke",
-      email: "amaka.okeke@nastnigeria.org",
-      phone: "+234 802 345 6789",
-      location: "Abuja FCT",
-      role: "Junior Surveyor",
-      specialization: "Cadastral Surveying",
-      status: "Active",
-      joinDate: "2022-06-10",
-      licenseNumber: "SUR/FCT/2022/002",
-      avatar:
-        "https://images.unsplash.com/photo-1494790108755-2616b332e234?w=150&h=150&fit=crop&crop=face",
-    },
-  ]);
+  // Fetch members from Supabase
+  useEffect(() => {
+    fetchMembers();
+    fetchMessages();
+  }, []);
 
-  // Sample contact messages
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      name: "David Okafor",
-      email: "david.okafor@gmail.com",
-      subject: "Membership Application Inquiry",
-      message:
-        "I would like to know the requirements for becoming a member of NAST. I have 5 years of surveying experience.",
-      date: "2024-01-15T10:30:00Z",
-      status: "unread",
-    },
-    {
-      id: 2,
-      name: "Sarah Ahmed",
-      email: "sarah.ahmed@company.com",
-      subject: "Certification Verification",
-      message:
-        "I need to verify the certification of one of your members for a project we're working on.",
-      date: "2024-01-14T14:20:00Z",
-      status: "read",
-    },
-    {
-      id: 3,
-      name: "Michael Eze",
-      email: "m.eze@survey.ng",
-      subject: "Training Workshop Request",
-      message:
-        "Can you provide information about upcoming GIS training workshops?",
-      date: "2024-01-13T09:15:00Z",
-      status: "replied",
-    },
-  ]);
+  const fetchMembers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  const handleLogout = () => {
+      if (error) throw error;
+      setMembers(data || []);
+    } catch (error) {
+      setError(error.message);
+      console.error('Error fetching members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMessages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMessages(data || []);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     onLogout();
   };
 
-  // Member management
+  // Generate member ID
   const generateMemberId = () => {
     const nextNum = members.length + 1;
     return `NAST${nextNum.toString().padStart(3, "0")}`;
   };
 
+  // Generate license number
   const generateLicenseNumber = (location) => {
-    const stateCode = location.split(" ")[0].toUpperCase().slice(0, 3);
+    const stateCode = location ? location.split(" ")[0].toUpperCase().slice(0, 3) : "GEN";
     const year = new Date().getFullYear();
     const nextNum = members.length + 1;
     return `SUR/${stateCode}/${year}/${nextNum.toString().padStart(3, "0")}`;
   };
 
-  const handleAddMember = (e) => {
+  // Add new member to Supabase
+  const handleAddMember = async (e) => {
     e.preventDefault();
-    const member = {
-      ...newMember,
-      id: generateMemberId(),
-      licenseNumber: generateLicenseNumber(newMember.location),
-      status: "Active",
-      joinDate: new Date().toISOString().split("T")[0],
-      avatar:
-        newMember.avatar ||
-        `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
-    };
+    try {
+      const memberData = {
+        ...newMember,
+        id: generateMemberId(),
+        license_number: generateLicenseNumber(newMember.location),
+        join_date: new Date().toISOString().split("T")[0],
+        avatar: newMember.avatar || `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
+      };
 
-    setMembers([...members, member]);
-    setNewMember({
-      name: "",
-      email: "",
-      phone: "",
-      location: "",
-      role: "Junior Surveyor",
-      specialization: "",
-      avatar: "",
-    });
-    setShowAddMember(false);
+      const { data, error } = await supabase
+        .from('members')
+        .insert([memberData])
+        .select();
+
+      if (error) throw error;
+
+      setMembers([data[0], ...members]);
+      setNewMember({
+        name: "",
+        email: "",
+        phone: "",
+        location: "",
+        role: "Junior Surveyor",
+        specialization: "",
+        avatar: "",
+        status: "Active",
+        license_number: "",
+        blood_group: "",
+        years_experience: 0,
+        rating: 0,
+        projects_completed: 0
+      });
+      setShowAddMember(false);
+    } catch (error) {
+      console.error('Error adding member:', error);
+      alert('Error adding member: ' + error.message);
+    }
+  };
+
+  // Update member in Supabase
+  const handleUpdateMember = async (e) => {
+    e.preventDefault();
+    try {
+      const { error } = await supabase
+        .from('members')
+        .update(newMember)
+        .eq('id', editingMember.id);
+
+      if (error) throw error;
+
+      setMembers(members.map(m => m.id === editingMember.id ? { ...newMember } : m));
+      setEditingMember(null);
+      setNewMember({
+        name: "",
+        email: "",
+        phone: "",
+        location: "",
+        role: "Junior Surveyor",
+        specialization: "",
+        avatar: "",
+        status: "Active",
+        license_number: "",
+        blood_group: "",
+        years_experience: 0,
+        rating: 0,
+        projects_completed: 0
+      });
+      setShowAddMember(false);
+    } catch (error) {
+      console.error('Error updating member:', error);
+      alert('Error updating member: ' + error.message);
+    }
+  };
+
+  // Delete member from Supabase
+  const handleDeleteMember = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this member?")) return;
+
+    try {
+      const { error } = await supabase
+        .from('members')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMembers(members.filter(m => m.id !== id));
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      alert('Error deleting member: ' + error.message);
+    }
   };
 
   const handleEditMember = (member) => {
     setEditingMember(member);
     setNewMember(member);
     setShowAddMember(true);
-  };
-
-  const handleUpdateMember = (e) => {
-    e.preventDefault();
-    setMembers(
-      members.map((m) => (m.id === editingMember.id ? { ...newMember } : m))
-    );
-    setEditingMember(null);
-    setNewMember({
-      name: "",
-      email: "",
-      phone: "",
-      location: "",
-      role: "Junior Surveyor",
-      specialization: "",
-      avatar: "",
-    });
-    setShowAddMember(false);
-  };
-
-  const handleDeleteMember = (id) => {
-    if (window.confirm("Are you sure you want to delete this member?")) {
-      setMembers(members.filter((m) => m.id !== id));
-    }
   };
 
   const generateIdCard = (member) => {
@@ -202,15 +233,36 @@ function AdminDashboard({ onLogout }) {
       });
   };
 
-  const markMessageAsRead = (id) => {
-    setMessages(
-      messages.map((msg) => (msg.id === id ? { ...msg, status: "read" } : msg))
-    );
+  const markMessageAsRead = async (id) => {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ status: 'read' })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMessages(messages.map(msg => msg.id === id ? { ...msg, status: "read" } : msg));
+    } catch (error) {
+      console.error('Error updating message:', error);
+    }
   };
 
-  const deleteMessage = (id) => {
-    if (window.confirm("Are you sure you want to delete this message?")) {
-      setMessages(messages.filter((msg) => msg.id !== id));
+  const deleteMessage = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this message?")) return;
+
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setMessages(messages.filter(msg => msg.id !== id));
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      alert('Error deleting message: ' + error.message);
     }
   };
 
@@ -228,6 +280,17 @@ function AdminDashboard({ onLogout }) {
       msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-700">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -288,6 +351,13 @@ function AdminDashboard({ onLogout }) {
             </span>
           </button>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <p className="text-red-700">{error}</p>
+          </div>
+        )}
 
         {/* Members Tab */}
         {activeTab === "members" && (
@@ -358,6 +428,9 @@ function AdminDashboard({ onLogout }) {
                               src={member.avatar}
                               alt={member.name}
                               className="w-10 h-10 rounded-full object-cover"
+                              onError={(e) => {
+                                e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                              }}
                             />
                             <div>
                               <p className="font-semibold text-slate-900">
@@ -391,7 +464,7 @@ function AdminDashboard({ onLogout }) {
                         </td>
                         <td className="px-6 py-4">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {member.status}
+                            {member.status || "Active"}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -424,6 +497,13 @@ function AdminDashboard({ onLogout }) {
                   </tbody>
                 </table>
               </div>
+
+              {filteredMembers.length === 0 && (
+                <div className="text-center py-12">
+                  <Users className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500">No members found</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -494,7 +574,7 @@ function AdminDashboard({ onLogout }) {
                           {message.email}
                         </p>
                         <p className="text-sm text-slate-500">
-                          {new Date(message.date).toLocaleDateString("en-US", {
+                          {new Date(message.created_at || message.date).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -544,14 +624,21 @@ function AdminDashboard({ onLogout }) {
                   </div>
                 </div>
               ))}
+
+              {filteredMessages.length === 0 && (
+                <div className="text-center py-12">
+                  <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                  <p className="text-slate-500">No messages found</p>
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Add/Edit Member Modal */}
         {showAddMember && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold text-slate-900">
@@ -569,6 +656,12 @@ function AdminDashboard({ onLogout }) {
                         role: "Junior Surveyor",
                         specialization: "",
                         avatar: "",
+                        status: "Active",
+                        license_number: "",
+                        blood_group: "",
+                        years_experience: 0,
+                        rating: 0,
+                        projects_completed: 0
                       });
                     }}
                     className="p-2 text-slate-400 hover:text-slate-600 rounded-lg"
@@ -585,7 +678,7 @@ function AdminDashboard({ onLogout }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Full Name
+                      Full Name *
                     </label>
                     <input
                       type="text"
@@ -600,7 +693,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Email Address
+                      Email Address *
                     </label>
                     <input
                       type="email"
@@ -615,7 +708,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Phone Number
+                      Phone Number *
                     </label>
                     <input
                       type="tel"
@@ -630,7 +723,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Location/State
+                      Location/State *
                     </label>
                     <input
                       type="text"
@@ -665,7 +758,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Specialization
+                      Specialization *
                     </label>
                     <input
                       type="text"
@@ -679,6 +772,93 @@ function AdminDashboard({ onLogout }) {
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       placeholder="e.g., Land Surveying, GIS, etc."
                       required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={newMember.status}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, status: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Training">Training</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Blood Group
+                    </label>
+                    <select
+                      value={newMember.blood_group}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, blood_group: e.target.value })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <option value="">Select Blood Group</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Years of Experience
+                    </label>
+                    <input
+                      type="number"
+                      value={newMember.years_experience}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, years_experience: parseInt(e.target.value) || 0 })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Rating (0-5)
+                    </label>
+                    <input
+                      type="number"
+                      value={newMember.rating}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, rating: parseFloat(e.target.value) || 0 })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      min="0"
+                      max="5"
+                      step="0.1"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Projects Completed
+                    </label>
+                    <input
+                      type="number"
+                      value={newMember.projects_completed}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, projects_completed: parseInt(e.target.value) || 0 })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      min="0"
                     />
                   </div>
                 </div>
@@ -712,6 +892,12 @@ function AdminDashboard({ onLogout }) {
                         role: "Junior Surveyor",
                         specialization: "",
                         avatar: "",
+                        status: "Active",
+                        license_number: "",
+                        blood_group: "",
+                        years_experience: 0,
+                        rating: 0,
+                        projects_completed: 0
                       });
                     }}
                     className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors duration-200"

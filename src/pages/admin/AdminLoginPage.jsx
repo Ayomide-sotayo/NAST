@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Shield, Eye, EyeOff } from "lucide-react";
-import logo from "../../assets/logo.png"
+import logo from "../../assets/logo.png";
+import { supabase } from '../../supabaseClient'; // Adjust path as needed
 
 function AdminLoginPage({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginData, setLoginData] = useState({ username: "", password: "" });
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -13,16 +14,24 @@ function AdminLoginPage({ onLogin }) {
     setIsLoading(true);
     setError("");
 
-    // Simulate loading delay
-    setTimeout(() => {
-      // Simple authentication (in real app, use proper authentication)
-      if (loginData.username === "admin" && loginData.password === "nast2024") {
-        onLogin(true); // Notify parent component of successful login
-      } else {
-        setError("Invalid credentials. Please check your username and password.");
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginData.email,
+        password: loginData.password,
+      });
+
+      if (error) {
+        throw error;
       }
+
+      if (data.user) {
+        onLogin(true);
+      }
+    } catch (error) {
+      setError(error.message || "Invalid credentials. Please check your email and password.");
+    } finally {
       setIsLoading(false);
-    }, 800);
+    }
   };
 
   return (
@@ -46,14 +55,14 @@ function AdminLoginPage({ onLogin }) {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Username
+                Email
               </label>
               <input
-                type="text"
-                value={loginData.username}
-                onChange={(e) => setLoginData({...loginData, username: e.target.value})}
+                type="email"
+                value={loginData.email}
+                onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="Enter username"
+                placeholder="Enter your email"
                 required
                 disabled={isLoading}
               />
@@ -100,13 +109,11 @@ function AdminLoginPage({ onLogin }) {
             </button>
           </form>
 
-          {/* <div className="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+          <div className="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
             <p className="text-sm text-emerald-700">
-              <strong>Demo Credentials:</strong><br />
-              Username: admin<br />
-              Password: nast2024
+              <strong>Note:</strong> Use your Supabase authentication credentials
             </p>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

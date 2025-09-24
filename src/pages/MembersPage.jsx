@@ -10,7 +10,6 @@ function MembersPage() {
     {
       name: "John Adebayo",
       id: "NAST001",
-
       joinDate: "2020-01-15",
       email: "john.adebayo@nastnigeria.org",
       phone: "+234 801 234 5678",

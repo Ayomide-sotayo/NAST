@@ -7,8 +7,12 @@ import MembersPage from './pages/MembersPage';
 import ContactPage from './pages/ContactPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboard from './pages/admin/AdminPage.jsx';
+import { supabase } from './supabaseClient'; // Make sure this path is correct
 
 // Protected Route Component
+function ProtectedRoute({ children, isAuthenticated }) {
+  return isAuthenticated ? children : <Navigate to="/admin-login" replace />;
+}
 
 // Admin Login Route Component with redirect handling
 function AdminLoginRoute({ children, isAuthenticated, onLogin }) {
@@ -51,26 +55,65 @@ function AdminDashboardRoute({ isAuthenticated, onLogout }) {
 }
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    // Check if user was previously authenticated (optional: persist login state)
-    const savedAuthState = sessionStorage.getItem('adminAuthenticated');
-    return savedAuthState === 'true';
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Save authentication state to sessionStorage (optional: for session persistence)
+  // Check for active session on component mount
   useEffect(() => {
-    sessionStorage.setItem('adminAuthenticated', isAuthenticated.toString());
-  }, [isAuthenticated]);
+    checkAuthState();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      // eslint-disable-next-line no-unused-vars
+      (event, session) => {
+        if (event === 'SIGNED_IN') {
+          setIsAuthenticated(true);
+        } else if (event === 'SIGNED_OUT') {
+          setIsAuthenticated(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkAuthState = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    } catch (error) {
+      console.error('Error checking auth state:', error);
+      setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = (authStatus) => {
     setIsAuthenticated(authStatus);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    // Clear any stored auth data
-    sessionStorage.removeItem('adminAuthenticated');
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setIsAuthenticated(false);
+      sessionStorage.removeItem('adminAuthenticated');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-700">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
