@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import logo from "../../assets/logo.png";
-import { supabase } from '../../supabaseClient'; // Adjust path as needed
+import { supabase } from '../../supabaseClient.js';
 
 function AdminLoginPage({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);

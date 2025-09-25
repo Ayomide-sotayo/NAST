@@ -1,8 +1,10 @@
-// src/components/MemberIDCard.jsx
-import React from "react";
-import { Shield, QrCode } from "lucide-react";
+import { Shield } from "lucide-react";
+import QRCodeSVG from "react-qr-code";
 
 const MemberIDCard = ({ member }) => {
+  console.log("QRCodeSVG:", QRCodeSVG);
+  console.log("Shield:", Shield);
+
   return (
     <div className="w-[85mm] h-[54mm] bg-gradient-to-br from-slate-50 to-blue-50 border-2 border-slate-300 rounded-xl shadow-lg overflow-hidden relative">
       {/* Watermark */}
@@ -28,10 +30,21 @@ const MemberIDCard = ({ member }) => {
               src={member.avatar}
               alt={member.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src =
+                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+              }}
             />
           </div>
           <div className="mt-2 bg-white p-1 rounded">
-            <QrCode className="w-10 h-10 text-emerald-700" />
+            {member?.id && (
+              <QRCodeSVG
+                value={`${window.location.origin}/members/${member.id}`}
+                size={40}
+                level="M"
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              />
+            )}
           </div>
         </div>
 
@@ -60,7 +73,13 @@ const MemberIDCard = ({ member }) => {
             <div className="flex">
               <span className="text-slate-600 w-20">License:</span>
               <span className="font-medium text-slate-800 truncate">
-                {member.licenseNumber}
+                {member.license_number}
+              </span>
+            </div>
+            <div className="flex">
+              <span className="text-slate-600 w-20">Blood Group:</span>
+              <span className="font-medium text-slate-800">
+                {member.blood_group || "N/A"}
               </span>
             </div>
             <div className="mt-2 pt-2 border-t border-slate-200 text-[10px] text-slate-500">

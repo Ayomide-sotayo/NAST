@@ -1,83 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Mail, Phone, MapPin, Calendar, Award, Shield, Star, ExternalLink } from "lucide-react";
+import { supabase } from '../supabaseClient';
 
 function MembersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterRole, setFilterRole] = useState("All");
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample member data
-  const members = [
-    {
-      name: "John Adebayo",
-      id: "NAST001",
-      joinDate: "2020-01-15",
-      email: "john.adebayo@nastnigeria.org",
-      phone: "+234 801 234 5678",
-      location: "Lagos State",
-      specialization: "Land Surveying",
-      status: "Active",
-      licenseNumber: "SUR/LAG/2020/001",
-      expiryDate: "2025-12-31",
-      bloodGroup: "O+",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-      yearsExperience: 4,
-      rating: 4.8,
-      projectsCompleted: 156
-    },
-    {
-      name: "Amaka Okeke",
-      id: "NAST002",
+  // Fetch members from Supabase
+  useEffect(() => {
+    fetchMembers();
+  }, []);
 
-      joinDate: "2022-06-10",
-      email: "amaka.okeke@nastnigeria.org",
-      phone: "+234 802 345 6789",
-      location: "Abuja FCT",
-      specialization: "Cadastral Surveying",
-      status: "Active",
-      licenseNumber: "SUR/FCT/2022/002",
-      expiryDate: "2025-12-31",
-      bloodGroup: "A+",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b332e234?w=150&h=150&fit=crop&crop=face",
-      yearsExperience: 2,
-      rating: 4.6,
-      projectsCompleted: 78
-    },
-    {
-      name: "Tunde Bello",
-      id: "NAST003",
-      joinDate: "2019-03-22",
-      email: "tunde.bello@nastnigeria.org",
-      phone: "+234 803 456 7890",
-      location: "Ogun State",
-      specialization: "Engineering Surveying",
-      status: "Active",
-      licenseNumber: "SUR/OGU/2019/003",
-      expiryDate: "2025-12-31",
-      bloodGroup: "B+",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-      yearsExperience: 5,
-      rating: 4.9,
-      projectsCompleted: 203
-    },
-    {
-      name: "Obidairo Peter",
-      id: "NAST004",
-     
-      joinDate: "2023-09-05",
-      email: "obidairo.peter@nastnigeria.org",
-      phone: "+234 816 541 4901",
-      location: "Ifo Zone",
-      specialization: "Hydrographic Surveying",
-      status: "Active",
-      licenseNumber: "SUR/OGU/2023/004",
-      expiryDate: "2025-12-31",
-      bloodGroup: "AB+",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      yearsExperience: 1,
-      rating: 4.4,
-      projectsCompleted: 32
-    },
-  ];
+  const fetchMembers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('members')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setMembers(data || []);
+    } catch (error) {
+      setError(error.message);
+      console.error('Error fetching members:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter members
   const filteredMembers = members.filter((member) => {
@@ -97,6 +50,8 @@ function MembersPage() {
         return "bg-green-100 text-green-800 border-green-200";
       case "Training":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "Inactive":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -104,6 +59,7 @@ function MembersPage() {
 
   // Format date
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
     const options = { year: "numeric", month: "short", day: "2-digit" };
     return new Date(dateString).toLocaleDateString("en-GB", options);
   };
@@ -136,6 +92,37 @@ function MembersPage() {
     return stars;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-700">Loading members...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-red-600" />
+          </div>
+          <h3 className="text-xl font-semibold text-slate-800 mb-2">Error Loading Members</h3>
+          <p className="text-slate-600">{error}</p>
+          <button 
+            onClick={fetchMembers}
+            className="mt-4 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 font-sans">
       {/* Header Section */}
@@ -164,7 +151,7 @@ function MembersPage() {
               Nigeria Association of Surveyors & Topographers
             </p>
             <p className="text-sm text-emerald-300 font-medium">
-              📋 Discover our certified professionals • Connect with experts in your area
+              📋 {members.length} Certified Professionals • Connect with experts in your area
             </p>
           </div>
         </div>
@@ -206,6 +193,7 @@ function MembersPage() {
                 <option value="Senior Surveyor">Senior Surveyor</option>
                 <option value="Junior Surveyor">Junior Surveyor</option>
                 <option value="Survey Tech">Survey Tech</option>
+                <option value="Principal Surveyor">Principal Surveyor</option>
               </select>
             </div>
           </div>
@@ -226,7 +214,7 @@ function MembersPage() {
                   {/* Status and ID */}
                   <div className="absolute top-4 left-4 flex items-center space-x-2">
                     <span className={`px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(member.status)}`}>
-                      {member.status}
+                      {member.status || 'Active'}
                     </span>
                   </div>
                   
@@ -249,9 +237,12 @@ function MembersPage() {
                     <div className="relative">
                       <div className="w-24 h-24 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
                         <img
-                          src={member.avatar}
+                          src={member.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"}
                           alt={member.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                          }}
                         />
                       </div>
                     </div>
@@ -264,8 +255,8 @@ function MembersPage() {
                     
                     {/* Rating */}
                     <div className="flex items-center justify-center space-x-1 mb-2">
-                      {renderStars(member.rating)}
-                      <span className="text-sm text-gray-600 ml-2">({member.rating})</span>
+                      {renderStars(member.rating || 0)}
+                      <span className="text-sm text-gray-600 ml-2">({member.rating || 0})</span>
                     </div>
                   </div>
 
@@ -274,21 +265,21 @@ function MembersPage() {
                     <div className="text-center">
                       <div className="bg-blue-50 rounded-lg p-3">
                         <Calendar className="w-5 h-5 text-blue-600 mx-auto mb-1" />
-                        <p className="text-sm font-bold text-blue-600">{member.yearsExperience}</p>
+                        <p className="text-sm font-bold text-blue-600">{member.years_experience || 0}</p>
                         <p className="text-xs text-blue-500">Years Exp</p>
                       </div>
                     </div>
                     <div className="text-center">
                       <div className="bg-purple-50 rounded-lg p-3">
                         <Award className="w-5 h-5 text-purple-600 mx-auto mb-1" />
-                        <p className="text-sm font-bold text-purple-600">{member.projectsCompleted}</p>
+                        <p className="text-sm font-bold text-purple-600">{member.projects_completed || 0}</p>
                         <p className="text-xs text-purple-500">Projects</p>
                       </div>
                     </div>
                     <div className="text-center">
                       <div className="bg-green-50 rounded-lg p-3">
                         <Star className="w-5 h-5 text-green-600 mx-auto mb-1" />
-                        <p className="text-sm font-bold text-green-600">{member.rating}</p>
+                        <p className="text-sm font-bold text-green-600">{member.rating || 0}</p>
                         <p className="text-xs text-green-500">Rating</p>
                       </div>
                     </div>
@@ -298,7 +289,7 @@ function MembersPage() {
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center text-sm text-gray-600">
                       <MapPin className="w-4 h-4 text-emerald-500 mr-3 flex-shrink-0" />
-                      <span>{member.location}</span>
+                      <span>{member.location || 'Location not specified'}</span>
                     </div>
                     <div className="flex items-center text-sm text-gray-600">
                       <Mail className="w-4 h-4 text-emerald-500 mr-3 flex-shrink-0" />
@@ -317,20 +308,40 @@ function MembersPage() {
                       <span className="text-xs font-medium text-gray-500">Valid Until</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="font-mono text-sm font-semibold text-gray-900">{member.licenseNumber}</span>
-                      <span className="text-sm font-semibold text-red-600">{formatDate(member.expiryDate)}</span>
+                      <span className="font-mono text-sm font-semibold text-gray-900">
+                        {member.license_number || 'Not assigned'}
+                      </span>
+                      <span className="text-sm font-semibold text-red-600">
+                        {formatDate(member.expiry_date || new Date(new Date().getFullYear() + 2, 11, 31))}
+                      </span>
                     </div>
                   </div>
 
+                  {/* Blood Group (if available) */}
+                  {member.blood_group && (
+                    <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-3 mb-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-medium text-gray-500">Blood Group</span>
+                        <span className="text-sm font-bold text-red-600">{member.blood_group}</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="flex space-x-2">
-                    <button className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2">
+                    <a 
+                      href={`mailto:${member.email}`}
+                      className="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
+                    >
                       <Mail className="w-4 h-4" />
                       <span>Contact</span>
-                    </button>
-                    <button className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center">
-                      <ExternalLink className="w-4 h-4" />
-                    </button>
+                    </a>
+                    <a 
+                      href={`tel:${member.phone}`}
+                      className="bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 py-3 px-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center"
+                    >
+                      <Phone className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
               </div>
@@ -339,7 +350,7 @@ function MembersPage() {
         </div>
 
         {/* No Results Message */}
-        {filteredMembers.length === 0 && (
+        {filteredMembers.length === 0 && members.length > 0 && (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-12 h-12 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -349,6 +360,21 @@ function MembersPage() {
             <h3 className="text-xl font-semibold text-slate-800 mb-2">No Members Found</h3>
             <p className="text-slate-600 max-w-md mx-auto">
               Adjust your search or filter criteria to find registered members.
+            </p>
+          </div>
+        )}
+
+        {/* No Members at All */}
+        {members.length === 0 && (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-12 h-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-800 mb-2">No Members Yet</h3>
+            <p className="text-slate-600 max-w-md mx-auto">
+              No members have been added to the directory yet. Check back later or contact the administrator.
             </p>
           </div>
         )}

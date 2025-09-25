@@ -14,6 +14,8 @@ import {
   X,
   Download,
   IdCard,
+  Upload,
+  Camera,
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import MemberIDCard from "../../components/MemberIDCard.jsx";
@@ -30,7 +32,11 @@ function AdminDashboard({ onLogout }) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [uploading, setUploading] = useState(false);
   const idCardRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   // New member form data
   const [newMember, setNewMember] = useState({
@@ -92,11 +98,95 @@ function AdminDashboard({ onLogout }) {
     onLogout();
   };
 
-  // Generate member ID
-  const generateMemberId = () => {
-    const nextNum = members.length + 1;
-    return `NAST${nextNum.toString().padStart(3, "0")}`;
+  // Handle image selection
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Please select an image smaller than 5MB');
+        return;
+      }
+
+      setImageFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
+  // Upload image to Supabase Storage
+const uploadImage = async (file, memberId) => {
+  try {
+    setUploading(true);
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${memberId}_${Date.now()}.${fileExt}`;
+    const filePath = `member-photos/${fileName}`;
+
+    // Upload the file
+    const { error: uploadError } = await supabase.storage
+      .from('member-images')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      // If file already exists, try with a different name
+      if (uploadError.message.includes('already exists')) {
+        const newFileName = `${memberId}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+        const newFilePath = `member-photos/${newFileName}`;
+        
+        const { error: retryError } = await supabase.storage
+          .from('member-images')
+          .upload(newFilePath, file);
+          
+        if (retryError) throw retryError;
+        
+        // Get public URL for the new file
+        const { data: { publicUrl } } = supabase.storage
+          .from('member-images')
+          .getPublicUrl(newFilePath);
+
+        return publicUrl;
+      }
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('member-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    // Return default avatar if upload fails
+    return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+  }
+};
+  // Generate unique member ID
+const generateMemberId = () => {
+  const existingIds = members.map(m => m.id);
+  let nextNum = members.length + 1;
+  let newId = `NAST${nextNum.toString().padStart(3, "0")}`;
+  
+  // Ensure the ID is unique
+  while (existingIds.includes(newId)) {
+    nextNum++;
+    newId = `NAST${nextNum.toString().padStart(3, "0")}`;
+  }
+  
+  return newId;
+};
 
   // Generate license number
   const generateLicenseNumber = (location) => {
@@ -106,80 +196,127 @@ function AdminDashboard({ onLogout }) {
     return `SUR/${stateCode}/${year}/${nextNum.toString().padStart(3, "0")}`;
   };
 
-  // Add new member to Supabase
-  const handleAddMember = async (e) => {
-    e.preventDefault();
-    try {
-      const memberData = {
-        ...newMember,
-        id: generateMemberId(),
-        license_number: generateLicenseNumber(newMember.location),
-        join_date: new Date().toISOString().split("T")[0],
-        avatar: newMember.avatar || `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face`,
-      };
-
-      const { data, error } = await supabase
-        .from('members')
-        .insert([memberData])
-        .select();
-
-      if (error) throw error;
-
-      setMembers([data[0], ...members]);
-      setNewMember({
-        name: "",
-        email: "",
-        phone: "",
-        location: "",
-        role: "Junior Surveyor",
-        specialization: "",
-        avatar: "",
-        status: "Active",
-        license_number: "",
-        blood_group: "",
-        years_experience: 0,
-        rating: 0,
-        projects_completed: 0
-      });
-      setShowAddMember(false);
-    } catch (error) {
-      console.error('Error adding member:', error);
-      alert('Error adding member: ' + error.message);
+ // Add new member to Supabase
+const handleAddMember = async (e) => {
+  e.preventDefault();
+  try {
+    setUploading(true);
+    setError(null);
+    
+    const memberId = generateMemberId();
+    let avatarUrl = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+    
+    // Upload image if selected
+    if (imageFile) {
+      avatarUrl = await uploadImage(imageFile, memberId);
     }
-  };
 
+    const memberData = {
+      id: memberId,
+      name: newMember.name.trim(),
+      email: newMember.email.trim().toLowerCase(),
+      phone: newMember.phone.trim(),
+      location: newMember.location.trim(),
+      role: newMember.role,
+      specialization: newMember.specialization.trim(),
+      avatar: avatarUrl,
+      status: newMember.status,
+      license_number: generateLicenseNumber(newMember.location),
+      blood_group: newMember.blood_group,
+      years_experience: parseInt(newMember.years_experience) || 0,
+      rating: parseFloat(newMember.rating) || 0,
+      projects_completed: parseInt(newMember.projects_completed) || 0,
+      join_date: new Date().toISOString().split("T")[0],
+      created_at: new Date().toISOString(),
+    };
+
+    console.log('Adding member:', memberData);
+
+    const { data, error } = await supabase
+      .from('members')
+      .insert([memberData])
+      .select();
+
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+
+    setMembers([data[0], ...members]);
+    resetForm();
+    setShowAddMember(false);
+    alert('Member added successfully!');
+    
+  } catch (error) {
+    console.error('Error adding member:', error);
+    setError('Error adding member: ' + error.message);
+    alert('Error adding member: ' + error.message);
+  } finally {
+    setUploading(false);
+  }
+};
   // Update member in Supabase
   const handleUpdateMember = async (e) => {
     e.preventDefault();
     try {
+      setUploading(true);
+      
+      let avatarUrl = newMember.avatar;
+      
+      // Upload new image if selected
+      if (imageFile) {
+        avatarUrl = await uploadImage(imageFile, editingMember.id);
+      }
+
+      const updateData = {
+        ...newMember,
+        avatar: avatarUrl,
+        years_experience: parseInt(newMember.years_experience) || 0,
+        rating: parseFloat(newMember.rating) || 0,
+        projects_completed: parseInt(newMember.projects_completed) || 0,
+      };
+
       const { error } = await supabase
         .from('members')
-        .update(newMember)
+        .update(updateData)
         .eq('id', editingMember.id);
 
       if (error) throw error;
 
-      setMembers(members.map(m => m.id === editingMember.id ? { ...newMember } : m));
+      setMembers(members.map(m => m.id === editingMember.id ? { ...editingMember, ...updateData } : m));
+      resetForm();
       setEditingMember(null);
-      setNewMember({
-        name: "",
-        email: "",
-        phone: "",
-        location: "",
-        role: "Junior Surveyor",
-        specialization: "",
-        avatar: "",
-        status: "Active",
-        license_number: "",
-        blood_group: "",
-        years_experience: 0,
-        rating: 0,
-        projects_completed: 0
-      });
       setShowAddMember(false);
+      alert('Member updated successfully!');
     } catch (error) {
       console.error('Error updating member:', error);
       alert('Error updating member: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setNewMember({
+      name: "",
+      email: "",
+      phone: "",
+      location: "",
+      role: "Junior Surveyor",
+      specialization: "",
+      avatar: "",
+      status: "Active",
+      license_number: "",
+      blood_group: "",
+      years_experience: 0,
+      rating: 0,
+      projects_completed: 0
+    });
+    setImageFile(null);
+    setImagePreview("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -205,6 +342,7 @@ function AdminDashboard({ onLogout }) {
   const handleEditMember = (member) => {
     setEditingMember(member);
     setNewMember(member);
+    setImagePreview(member.avatar);
     setShowAddMember(true);
   };
 
@@ -373,7 +511,10 @@ function AdminDashboard({ onLogout }) {
                 </p>
               </div>
               <button
-                onClick={() => setShowAddMember(true)}
+                onClick={() => {
+                  resetForm();
+                  setShowAddMember(true);
+                }}
                 className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-6 py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
               >
                 <Plus className="w-4 h-4" />
@@ -648,21 +789,7 @@ function AdminDashboard({ onLogout }) {
                     onClick={() => {
                       setShowAddMember(false);
                       setEditingMember(null);
-                      setNewMember({
-                        name: "",
-                        email: "",
-                        phone: "",
-                        location: "",
-                        role: "Junior Surveyor",
-                        specialization: "",
-                        avatar: "",
-                        status: "Active",
-                        license_number: "",
-                        blood_group: "",
-                        years_experience: 0,
-                        rating: 0,
-                        projects_completed: 0
-                      });
+                      resetForm();
                     }}
                     className="p-2 text-slate-400 hover:text-slate-600 rounded-lg"
                   >
@@ -675,6 +802,46 @@ function AdminDashboard({ onLogout }) {
                 onSubmit={editingMember ? handleUpdateMember : handleAddMember}
                 className="p-6 space-y-6"
               >
+                {/* Image Upload Section */}
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6">
+                  <div className="text-center">
+                    <div className="flex justify-center mb-4">
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-24 h-24 rounded-full object-cover border-4 border-emerald-500"
+                        />
+                      ) : (
+                        <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center">
+                          <Camera className="w-8 h-8 text-slate-400" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                    
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg transition-colors"
+                    >
+                      <Upload className="w-4 h-4" />
+                      <span>Choose Profile Photo</span>
+                    </button>
+                    
+                    <p className="text-sm text-slate-500 mt-2">
+                      PNG, JPG up to 5MB
+                    </p>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
@@ -863,55 +1030,37 @@ function AdminDashboard({ onLogout }) {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
-                    Profile Photo URL (Optional)
-                  </label>
-                  <input
-                    type="url"
-                    value={newMember.avatar}
-                    onChange={(e) =>
-                      setNewMember({ ...newMember, avatar: e.target.value })
-                    }
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                    placeholder="https://example.com/photo.jpg"
-                  />
-                </div>
-
                 <div className="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
                   <button
                     type="button"
                     onClick={() => {
                       setShowAddMember(false);
                       setEditingMember(null);
-                      setNewMember({
-                        name: "",
-                        email: "",
-                        phone: "",
-                        location: "",
-                        role: "Junior Surveyor",
-                        specialization: "",
-                        avatar: "",
-                        status: "Active",
-                        license_number: "",
-                        blood_group: "",
-                        years_experience: 0,
-                        rating: 0,
-                        projects_completed: 0
-                      });
+                      resetForm();
                     }}
                     className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors duration-200"
+                    disabled={uploading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl transition-all duration-300"
+                    disabled={uploading}
+                    className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Save className="w-4 h-4" />
-                    <span>
-                      {editingMember ? "Update Member" : "Add Member"}
-                    </span>
+                    {uploading ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Saving...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>
+                          {editingMember ? "Update Member" : "Add Member"}
+                        </span>
+                      </>
+                    )}
                   </button>
                 </div>
               </form>
