@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Shield, Eye, EyeOff } from "lucide-react";
 import logo from "../../assets/logo.png";
-import { supabase } from '../../supabaseClient.js';
+import { supabase } from "../../supabaseClient.js";
 
 function AdminLoginPage({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +28,10 @@ function AdminLoginPage({ onLogin }) {
         onLogin(true);
       }
     } catch (error) {
-      setError(error.message || "Invalid credentials. Please check your email and password.");
+      setError(
+        error.message ||
+          "Invalid credentials. Please check your email and password."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -40,10 +43,14 @@ function AdminLoginPage({ onLogin }) {
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 p-2 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <img src={logo} alt="logo"/>
+              <img src={logo} alt="logo" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900">NAST Admin</h1>
-            <p className="text-slate-600 mt-2">Sign in to access the dashboard</p>
+            <h1 className="text-2xl font-bold text-slate-900">
+              NAST IFO ZONE Admin
+            </h1>
+            <p className="text-slate-600 mt-2">
+              Sign in to access the dashboard
+            </p>
           </div>
 
           {error && (
@@ -60,7 +67,9 @@ function AdminLoginPage({ onLogin }) {
               <input
                 type="email"
                 value={loginData.email}
-                onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                onChange={(e) =>
+                  setLoginData({ ...loginData, email: e.target.value })
+                }
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 placeholder="Enter your email"
                 required
@@ -76,7 +85,9 @@ function AdminLoginPage({ onLogin }) {
                 <input
                   type={showPassword ? "text" : "password"}
                   value={loginData.password}
-                  onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                  onChange={(e) =>
+                    setLoginData({ ...loginData, password: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent pr-12"
                   placeholder="Enter password"
                   required
@@ -88,7 +99,11 @@ function AdminLoginPage({ onLogin }) {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-700 disabled:opacity-50"
                   disabled={isLoading}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
                 </button>
               </div>
             </div>
@@ -108,12 +123,6 @@ function AdminLoginPage({ onLogin }) {
               )}
             </button>
           </form>
-
-          <div className="mt-6 p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-            <p className="text-sm text-emerald-700">
-              <strong>Note:</strong> Use your Supabase authentication credentials
-            </p>
-          </div>
         </div>
       </div>
     </div>

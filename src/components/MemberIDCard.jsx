@@ -15,7 +15,7 @@ const MemberIDCard = ({ member }) => {
         <div className="flex items-center">
           <Shield className="text-white w-5 h-5 mr-2" />
           <span className="text-white text-sm font-bold tracking-wider">
-            NAST MEMBER ID
+            NAST IFO ZONE ID
           </span>
         </div>
         <div className="text-xs text-emerald-200 font-mono">#{member.id}</div>
@@ -91,8 +91,8 @@ const MemberIDCard = ({ member }) => {
 
       {/* Association Seal */}
       <div className="absolute bottom-2 right-2 text-[8px] text-center text-slate-500">
-        <div className="font-bold">NAST NIGERIA</div>
-        <div className="font-light">Surveyors & Topographers</div>
+        <div className="font-bold">NAST IFO ZONE</div>
+        <div className="font-light">Survey Technicians</div>
       </div>
     </div>
   );

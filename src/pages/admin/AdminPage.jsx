@@ -442,10 +442,10 @@ const handleAddMember = async (e) => {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-slate-900">
-                  NAST Admin Dashboard
+                  NAST IFO Zone Admin
                 </h1>
                 <p className="text-sm text-slate-600">
-                  Nigeria Association of Surveyors & Topographers
+                  Nigeria Association of Survey Technicians
                 </p>
               </div>
             </div>
@@ -507,7 +507,7 @@ const handleAddMember = async (e) => {
                   Members Management
                 </h2>
                 <p className="text-slate-600">
-                  Add, edit, and manage NAST members
+                  Add, edit, and manage NAST IFO ZONE members
                 </p>
               </div>
               <button
