@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
+import { supabase } from '../supabaseClient.js'; 
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -10,25 +11,51 @@ function ContactPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error when user starts typing again
+    if (submitError) setSubmitError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError("");
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Insert form data into Supabase
+      // eslint-disable-next-line no-unused-vars
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .insert([
+          {
+            name: formData.name.trim(),
+            email: formData.email.trim().toLowerCase(),
+            subject: formData.subject.trim(),
+            message: formData.message.trim(),
+            status: 'unread',
+            created_at: new Date().toISOString(),
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Success
       setSubmitSuccess(true);
       setFormData({ name: "", email: "", subject: "", message: "" });
 
       // Reset success message after 5 seconds
       setTimeout(() => setSubmitSuccess(false), 5000);
-    }, 1500);
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitError('Failed to send message. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -127,11 +154,18 @@ function ContactPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Error Message */}
+                    {submitError && (
+                      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                        <p className="text-red-700 text-sm">{submitError}</p>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-2">
-                          Full Name
+                          Full Name *
                         </label>
                         <input
                           type="text"
@@ -140,14 +174,15 @@ function ContactPage() {
                           value={formData.name}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900"
+                          disabled={isSubmitting}
+                          className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="Enter your full name"
                         />
                       </div>
 
                       <div>
                         <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-2">
-                          Email Address
+                          Email Address *
                         </label>
                         <input
                           type="email"
@@ -156,7 +191,8 @@ function ContactPage() {
                           value={formData.email}
                           onChange={handleChange}
                           required
-                          className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900"
+                          disabled={isSubmitting}
+                          className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                           placeholder="Enter your email"
                         />
                       </div>
@@ -164,7 +200,7 @@ function ContactPage() {
 
                     <div>
                       <label htmlFor="subject" className="block text-sm font-semibold text-slate-700 mb-2">
-                        Subject
+                        Subject *
                       </label>
                       <input
                         type="text"
@@ -173,14 +209,15 @@ function ContactPage() {
                         value={formData.subject}
                         onChange={handleChange}
                         required
-                        className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900"
+                        disabled={isSubmitting}
+                        className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="What's this about?"
                       />
                     </div>
 
                     <div>
                       <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-2">
-                        Your Message
+                        Your Message *
                       </label>
                       <textarea
                         id="message"
@@ -188,15 +225,15 @@ function ContactPage() {
                         value={formData.message}
                         onChange={handleChange}
                         required
+                        disabled={isSubmitting}
                         rows="6"
-                        className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900 resize-none"
+                        className="w-full px-4 py-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300 text-slate-900 resize-none disabled:opacity-50 disabled:cursor-not-allowed"
                         placeholder="Tell us how we can help you..."
                       ></textarea>
                     </div>
 
                     <button
-                      type="button"
-                      onClick={handleSubmit}
+                      type="submit"
                       disabled={isSubmitting}
                       className={`w-full py-4 px-8 rounded-xl text-white font-semibold flex items-center justify-center transition-all duration-300 text-lg ${
                         isSubmitting
@@ -235,7 +272,7 @@ function ContactPage() {
                         </>
                       )}
                     </button>
-                  </div>
+                  </form>
                 )}
               </div>
             </div>

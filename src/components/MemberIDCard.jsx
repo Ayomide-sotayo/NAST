@@ -1,101 +1,152 @@
-import { Shield } from "lucide-react";
+import { Shield, Phone, Award, Briefcase, Star } from "lucide-react";
 import QRCodeSVG from "react-qr-code";
-
+import logo from '../assets/logo.png'
 const MemberIDCard = ({ member }) => {
-  console.log("QRCodeSVG:", QRCodeSVG);
-  console.log("Shield:", Shield);
-
   return (
-    <div className="w-[85mm] h-[54mm] bg-gradient-to-br from-slate-50 to-blue-50 border-2 border-slate-300 rounded-xl shadow-lg overflow-hidden relative">
-      {/* Watermark */}
-      <div className="absolute inset-0 opacity-5 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDYwIDYwIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiMwMDc5NmYiIGZpbGwtb3BhY2l0eT0iMC4yIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyIi8+PC9nPjwvZz48L3N2Zz4=')]"></div>
-
-      {/* Card Header */}
-      <div className="bg-gradient-to-r from-emerald-700 to-green-700 py-2 px-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <Shield className="text-white w-5 h-5 mr-2" />
-          <span className="text-white text-sm font-bold tracking-wider">
-            NAST IFO ZONE ID
-          </span>
+    <div className="w-[120mm] h-[80mm] bg-white border border-emerald-200 rounded-3xl shadow-2xl overflow-hidden relative" style={{ fontFamily: 'Poppins, sans-serif' }}>
+      {/* Header with Gradient */}
+      <div className="relative h-16 bg-gradient-to-r from-emerald-600 via-emerald-500 to-green-500 p-2">
+        {/* NAST Logo and Title */}
+        <div className="absolute top-2 left-6 flex items-center space-x-3">
+          <div className="w-12 h-12 rounded-2xl shadow-lg">
+            <img src={logo} alt="logo" />
+          </div>
+          <div className="text-white flex">
+            <div className="text-xl font-bold leading-tight me-1">NAST</div>
+            <div className="text-lg font-medium opacity-95">IFO ZONE</div>
+          </div>
         </div>
-        <div className="text-xs text-emerald-200 font-mono">#{member.id}</div>
+
+        {/* Member ID */}
+        <div className="absolute top-4 right-6 text-right">
+          <div className="text-xs text-white opacity-90 font-medium">MEMBER ID</div>
+          <div className="text-lg text-white font-semibold tracking-wide">{member.id || "NAST001"}</div>
+        </div>
+
+        {/* Curved Bottom */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 200 25" className="w-full h-4 text-emerald-500">
+            <path 
+              d="M0,0 Q100,25 200,0 L200,25 L0,25 Z" 
+              fill="currentColor"
+            />
+          </svg>
+        </div>
       </div>
 
-      {/* Card Content */}
-      <div className="p-4 flex">
-        {/* Left - Photo and QR */}
-        <div className="flex flex-col items-center mr-4">
-          <div className="w-20 h-20 border-2 border-emerald-600 rounded-lg overflow-hidden bg-white">
+      {/* Main Content - Compact Layout */}
+      <div className="flex h-[calc(100%-5rem)] p-4">
+        {/* Left Section - Photo and Name */}
+        <div className="w-1/3 block items-center space-x-3">
+          {/* Photo */}
+          <div className="w-27 h-30 rounded-xl border-2 border-emerald-500 shadow-md overflow-hidden bg-gray-100">
             <img
               src={member.avatar}
               alt={member.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.target.src =
-                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
               }}
             />
           </div>
-          <div className="mt-2 bg-white p-1 rounded">
-            {member?.id && (
+
+          {/* Name and Role */}
+          <div className="flex-1">
+            <h2 className="text-[14px] font-bold text-slate-900 leading-tight my-2">
+              {member.name || "Member Name"}
+            </h2>
+            
+            <div className="bg-gradient-to-r w-27 from-emerald-500 to-green-500 text-white text-[14px] font-semibold py-1 text-center rounded-lg">
+              {member.role || "Survey Tech"}
+            </div>
+          </div>
+        </div>
+
+        {/* Center Section - Member Details */}
+        <div className="flex-1 px-2 flex flex-col justify-center">
+          <div className="space-y-3">
+            {/* License Number */}
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <Award className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-600 font-medium">License Number</div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {member.license_number || "SUR/OGN/2024/001"}
+                </div>
+              </div>
+            </div>
+
+            {/* Phone */}
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <Phone className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-600 font-medium">Phone Number</div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {member.phone || "+234 812 345 6789"}
+                </div>
+              </div>
+            </div>
+
+            {/* Specialization */}
+            <div className="flex items-center space-x-2">
+              <div className="w-6 h-6 bg-emerald-100 rounded-lg flex items-center justify-center">
+                <Star className="w-4 h-4 text-emerald-600" />
+              </div>
+              <div className="flex-1">
+                <div className="text-xs text-gray-600 font-medium">Specialization</div>
+                <div className="text-sm font-semibold text-slate-900">
+                  {member.specialization || "Land Surveying"}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section - QR Code */}
+        <div className="w-1/4 flex flex-col items-center justify-center">
+          <div className="text-center mb-2">
+            <div className="text-xs text-gray-700 font-bold">VERIFICATION</div>
+            <div className="text-xs text-gray-500">Scan to verify</div>
+          </div>
+          
+          {member?.id && (
+            <div className="bg-white p-2 rounded-xl border border-emerald-200 shadow-md">
               <QRCodeSVG
-                value={`${window.location.origin}/members/${member.id}`}
-                size={40}
+                value={`NAST-${member.id}-${member.license_number || "SUR001"}-${member.name || "Member"}`}
+                size={60}
                 level="M"
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
               />
-            )}
-          </div>
-        </div>
-
-        {/* Right - Member Details */}
-        <div className="flex-1">
-          <h3 className="font-bold text-slate-800 text-lg mb-1">
-            {member.name}
-          </h3>
-          <div className="space-y-1 text-xs">
-            <div className="flex">
-              <span className="text-slate-600 w-20">Role:</span>
-              <span className="font-medium text-slate-800">{member.role}</span>
             </div>
-            <div className="flex">
-              <span className="text-slate-600 w-20">Specialty:</span>
-              <span className="font-medium text-slate-800">
-                {member.specialization}
-              </span>
+          )}
+          
+          <div className="text-center mt-2">
+            <div className="text-xs text-emerald-600 font-bold font-mono">
+              ID: {member.id || "NAST001"}
             </div>
-            <div className="flex">
-              <span className="text-slate-600 w-20">Location:</span>
-              <span className="font-medium text-slate-800">
-                {member.location}
-              </span>
-            </div>
-            <div className="flex">
-              <span className="text-slate-600 w-20">License:</span>
-              <span className="font-medium text-slate-800 truncate">
-                {member.license_number}
-              </span>
-            </div>
-            <div className="flex">
-              <span className="text-slate-600 w-20">Blood Group:</span>
-              <span className="font-medium text-slate-800">
-                {member.blood_group || "N/A"}
-              </span>
-            </div>
-            <div className="mt-2 pt-2 border-t border-slate-200 text-[10px] text-slate-500">
-              Valid until: Dec 31, {new Date().getFullYear() + 2}
+            <div className="text-xs text-gray-500 font-medium">
+              Valid {new Date().getFullYear()}-{new Date().getFullYear() + 2}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Association Seal */}
-      <div className="absolute bottom-2 right-2 text-[8px] text-center text-slate-500">
-        <div className="font-bold">NAST IFO ZONE</div>
-        <div className="font-light">Survey Technicians</div>
+      {/* Footer */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-r from-emerald-600 to-green-500 text-white text-center py-2">
+        <div className="text-sm font-semibold tracking-tight">NIGERIAN ASSOCIATION OF SURVEY TECHNICIANS</div>
       </div>
+
+      {/* Decorative Elements */}
+      <div className="absolute top-16 right-12 w-6 h-6 bg-emerald-300 rounded-full opacity-20"></div>
+      <div className="absolute top-12 right-16 w-4 h-4 bg-green-300 rounded-full opacity-30"></div>
+      <div className="absolute bottom-12 left-12 w-5 h-5 bg-emerald-200 rounded-full opacity-25"></div>
+      
+      {/* Subtle gradient overlay for premium feel */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50 opacity-30 pointer-events-none"></div>
     </div>
   );
 };
-
 export default MemberIDCard;

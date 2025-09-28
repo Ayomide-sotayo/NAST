@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import MemberIDCard from "../../components/MemberIDCard.jsx";
-import { supabase } from '../../supabaseClient.js';
+import { supabase } from "../../supabaseClient.js";
 
 function AdminDashboard({ onLogout }) {
   const [activeTab, setActiveTab] = useState("members");
@@ -52,7 +52,7 @@ function AdminDashboard({ onLogout }) {
     blood_group: "",
     years_experience: 0,
     rating: 0,
-    projects_completed: 0
+    projects_completed: 0,
   });
 
   // Fetch members from Supabase
@@ -65,15 +65,15 @@ function AdminDashboard({ onLogout }) {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('members')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("members")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setMembers(data || []);
     } catch (error) {
       setError(error.message);
-      console.error('Error fetching members:', error);
+      console.error("Error fetching members:", error);
     } finally {
       setLoading(false);
     }
@@ -82,14 +82,14 @@ function AdminDashboard({ onLogout }) {
   const fetchMessages = async () => {
     try {
       const { data, error } = await supabase
-        .from('contact_messages')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setMessages(data || []);
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error("Error fetching messages:", error);
     }
   };
 
@@ -103,19 +103,19 @@ function AdminDashboard({ onLogout }) {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        alert('Please select an image file');
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
         return;
       }
-      
+
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Please select an image smaller than 5MB');
+        alert("Please select an image smaller than 5MB");
         return;
       }
 
       setImageFile(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onload = () => {
@@ -126,143 +126,147 @@ function AdminDashboard({ onLogout }) {
   };
 
   // Upload image to Supabase Storage
-const uploadImage = async (file, memberId) => {
-  try {
-    setUploading(true);
-    
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${memberId}_${Date.now()}.${fileExt}`;
-    const filePath = `member-photos/${fileName}`;
+  const uploadImage = async (file, memberId) => {
+    try {
+      setUploading(true);
 
-    // Upload the file
-    const { error: uploadError } = await supabase.storage
-      .from('member-images')
-      .upload(filePath, file);
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${memberId}_${Date.now()}.${fileExt}`;
+      const filePath = `member-photos/${fileName}`;
 
-    if (uploadError) {
-      // If file already exists, try with a different name
-      if (uploadError.message.includes('already exists')) {
-        const newFileName = `${memberId}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-        const newFilePath = `member-photos/${newFileName}`;
-        
-        const { error: retryError } = await supabase.storage
-          .from('member-images')
-          .upload(newFilePath, file);
-          
-        if (retryError) throw retryError;
-        
-        // Get public URL for the new file
-        const { data: { publicUrl } } = supabase.storage
-          .from('member-images')
-          .getPublicUrl(newFilePath);
+      // Upload the file
+      const { error: uploadError } = await supabase.storage
+        .from("member-images")
+        .upload(filePath, file);
 
-        return publicUrl;
+      if (uploadError) {
+        // If file already exists, try with a different name
+        if (uploadError.message.includes("already exists")) {
+          const newFileName = `${memberId}_${Date.now()}_${Math.random()
+            .toString(36)
+            .substring(2, 9)}.${fileExt}`;
+          const newFilePath = `member-photos/${newFileName}`;
+
+          const { error: retryError } = await supabase.storage
+            .from("member-images")
+            .upload(newFilePath, file);
+
+          if (retryError) throw retryError;
+
+          // Get public URL for the new file
+          const {
+            data: { publicUrl },
+          } = supabase.storage.from("member-images").getPublicUrl(newFilePath);
+
+          return publicUrl;
+        }
+        throw uploadError;
       }
-      throw uploadError;
+
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("member-images").getPublicUrl(filePath);
+
+      return publicUrl;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // Return default avatar if upload fails
+      return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+    }
+  };
+  // Generate unique member ID
+  const generateMemberId = () => {
+    const existingIds = members.map((m) => m.id);
+    let nextNum = members.length + 1;
+    let newId = `NAST${nextNum.toString().padStart(3, "0")}`;
+
+    // Ensure the ID is unique
+    while (existingIds.includes(newId)) {
+      nextNum++;
+      newId = `NAST${nextNum.toString().padStart(3, "0")}`;
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('member-images')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
-  } catch (error) {
-    console.error('Error uploading image:', error);
-    // Return default avatar if upload fails
-    return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
-  }
-};
-  // Generate unique member ID
-const generateMemberId = () => {
-  const existingIds = members.map(m => m.id);
-  let nextNum = members.length + 1;
-  let newId = `NAST${nextNum.toString().padStart(3, "0")}`;
-  
-  // Ensure the ID is unique
-  while (existingIds.includes(newId)) {
-    nextNum++;
-    newId = `NAST${nextNum.toString().padStart(3, "0")}`;
-  }
-  
-  return newId;
-};
+    return newId;
+  };
 
   // Generate license number
   const generateLicenseNumber = (location) => {
-    const stateCode = location ? location.split(" ")[0].toUpperCase().slice(0, 3) : "GEN";
+    const stateCode = location
+      ? location.split(" ")[0].toUpperCase().slice(0, 3)
+      : "GEN";
     const year = new Date().getFullYear();
     const nextNum = members.length + 1;
     return `SUR/${stateCode}/${year}/${nextNum.toString().padStart(3, "0")}`;
   };
 
- // Add new member to Supabase
-const handleAddMember = async (e) => {
-  e.preventDefault();
-  try {
-    setUploading(true);
-    setError(null);
-    
-    const memberId = generateMemberId();
-    let avatarUrl = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
-    
-    // Upload image if selected
-    if (imageFile) {
-      avatarUrl = await uploadImage(imageFile, memberId);
+  // Add new member to Supabase
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    try {
+      setUploading(true);
+      setError(null);
+
+      const memberId = generateMemberId();
+      let avatarUrl =
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+
+      // Upload image if selected
+      if (imageFile) {
+        avatarUrl = await uploadImage(imageFile, memberId);
+      }
+
+      const memberData = {
+        id: memberId,
+        name: newMember.name.trim(),
+        email: newMember.email.trim().toLowerCase(),
+        phone: newMember.phone.trim(),
+        location: newMember.location.trim(),
+        role: newMember.role,
+        specialization: newMember.specialization.trim(),
+        avatar: avatarUrl,
+        status: newMember.status,
+        license_number: generateLicenseNumber(newMember.location),
+        blood_group: newMember.blood_group,
+        years_experience: parseInt(newMember.years_experience) || 0,
+        rating: parseFloat(newMember.rating) || 0,
+        projects_completed: parseInt(newMember.projects_completed) || 0,
+        join_date: new Date().toISOString().split("T")[0],
+        created_at: new Date().toISOString(),
+      };
+
+      console.log("Adding member:", memberData);
+
+      const { data, error } = await supabase
+        .from("members")
+        .insert([memberData])
+        .select();
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      setMembers([data[0], ...members]);
+      resetForm();
+      setShowAddMember(false);
+      alert("Member added successfully!");
+    } catch (error) {
+      console.error("Error adding member:", error);
+      setError("Error adding member: " + error.message);
+      alert("Error adding member: " + error.message);
+    } finally {
+      setUploading(false);
     }
-
-    const memberData = {
-      id: memberId,
-      name: newMember.name.trim(),
-      email: newMember.email.trim().toLowerCase(),
-      phone: newMember.phone.trim(),
-      location: newMember.location.trim(),
-      role: newMember.role,
-      specialization: newMember.specialization.trim(),
-      avatar: avatarUrl,
-      status: newMember.status,
-      license_number: generateLicenseNumber(newMember.location),
-      blood_group: newMember.blood_group,
-      years_experience: parseInt(newMember.years_experience) || 0,
-      rating: parseFloat(newMember.rating) || 0,
-      projects_completed: parseInt(newMember.projects_completed) || 0,
-      join_date: new Date().toISOString().split("T")[0],
-      created_at: new Date().toISOString(),
-    };
-
-    console.log('Adding member:', memberData);
-
-    const { data, error } = await supabase
-      .from('members')
-      .insert([memberData])
-      .select();
-
-    if (error) {
-      console.error('Supabase error:', error);
-      throw error;
-    }
-
-    setMembers([data[0], ...members]);
-    resetForm();
-    setShowAddMember(false);
-    alert('Member added successfully!');
-    
-  } catch (error) {
-    console.error('Error adding member:', error);
-    setError('Error adding member: ' + error.message);
-    alert('Error adding member: ' + error.message);
-  } finally {
-    setUploading(false);
-  }
-};
+  };
   // Update member in Supabase
   const handleUpdateMember = async (e) => {
     e.preventDefault();
     try {
       setUploading(true);
-      
+
       let avatarUrl = newMember.avatar;
-      
+
       // Upload new image if selected
       if (imageFile) {
         avatarUrl = await uploadImage(imageFile, editingMember.id);
@@ -277,20 +281,24 @@ const handleAddMember = async (e) => {
       };
 
       const { error } = await supabase
-        .from('members')
+        .from("members")
         .update(updateData)
-        .eq('id', editingMember.id);
+        .eq("id", editingMember.id);
 
       if (error) throw error;
 
-      setMembers(members.map(m => m.id === editingMember.id ? { ...editingMember, ...updateData } : m));
+      setMembers(
+        members.map((m) =>
+          m.id === editingMember.id ? { ...editingMember, ...updateData } : m
+        )
+      );
       resetForm();
       setEditingMember(null);
       setShowAddMember(false);
-      alert('Member updated successfully!');
+      alert("Member updated successfully!");
     } catch (error) {
-      console.error('Error updating member:', error);
-      alert('Error updating member: ' + error.message);
+      console.error("Error updating member:", error);
+      alert("Error updating member: " + error.message);
     } finally {
       setUploading(false);
     }
@@ -311,7 +319,7 @@ const handleAddMember = async (e) => {
       blood_group: "",
       years_experience: 0,
       rating: 0,
-      projects_completed: 0
+      projects_completed: 0,
     });
     setImageFile(null);
     setImagePreview("");
@@ -325,17 +333,14 @@ const handleAddMember = async (e) => {
     if (!window.confirm("Are you sure you want to delete this member?")) return;
 
     try {
-      const { error } = await supabase
-        .from('members')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from("members").delete().eq("id", id);
 
       if (error) throw error;
 
-      setMembers(members.filter(m => m.id !== id));
+      setMembers(members.filter((m) => m.id !== id));
     } catch (error) {
-      console.error('Error deleting member:', error);
-      alert('Error deleting member: ' + error.message);
+      console.error("Error deleting member:", error);
+      alert("Error deleting member: " + error.message);
     }
   };
 
@@ -374,33 +379,38 @@ const handleAddMember = async (e) => {
   const markMessageAsRead = async (id) => {
     try {
       const { error } = await supabase
-        .from('contact_messages')
-        .update({ status: 'read' })
-        .eq('id', id);
+        .from("contact_messages")
+        .update({ status: "read" })
+        .eq("id", id);
 
       if (error) throw error;
 
-      setMessages(messages.map(msg => msg.id === id ? { ...msg, status: "read" } : msg));
+      setMessages(
+        messages.map((msg) =>
+          msg.id === id ? { ...msg, status: "read" } : msg
+        )
+      );
     } catch (error) {
-      console.error('Error updating message:', error);
+      console.error("Error updating message:", error);
     }
   };
 
   const deleteMessage = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this message?")) return;
+    if (!window.confirm("Are you sure you want to delete this message?"))
+      return;
 
     try {
       const { error } = await supabase
-        .from('contact_messages')
+        .from("contact_messages")
         .delete()
-        .eq('id', id);
+        .eq("id", id);
 
       if (error) throw error;
 
-      setMessages(messages.filter(msg => msg.id !== id));
+      setMessages(messages.filter((msg) => msg.id !== id));
     } catch (error) {
-      console.error('Error deleting message:', error);
-      alert('Error deleting message: ' + error.message);
+      console.error("Error deleting message:", error);
+      alert("Error deleting message: " + error.message);
     }
   };
 
@@ -570,7 +580,8 @@ const handleAddMember = async (e) => {
                               alt={member.name}
                               className="w-10 h-10 rounded-full object-cover"
                               onError={(e) => {
-                                e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                                e.target.src =
+                                  "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
                               }}
                             />
                             <div>
@@ -715,7 +726,9 @@ const handleAddMember = async (e) => {
                           {message.email}
                         </p>
                         <p className="text-sm text-slate-500">
-                          {new Date(message.created_at || message.date).toLocaleDateString("en-US", {
+                          {new Date(
+                            message.created_at || message.date
+                          ).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -818,7 +831,7 @@ const handleAddMember = async (e) => {
                         </div>
                       )}
                     </div>
-                    
+
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -826,7 +839,7 @@ const handleAddMember = async (e) => {
                       onChange={handleImageSelect}
                       className="hidden"
                     />
-                    
+
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
@@ -835,7 +848,7 @@ const handleAddMember = async (e) => {
                       <Upload className="w-4 h-4" />
                       <span>Choose Profile Photo</span>
                     </button>
-                    
+
                     <p className="text-sm text-slate-500 mt-2">
                       PNG, JPG up to 5MB
                     </p>
@@ -920,6 +933,7 @@ const handleAddMember = async (e) => {
                       <option value="Principal Surveyor">
                         Principal Surveyor
                       </option>
+                      <option value="P.R.O 1">P.R.O 1</option>
                     </select>
                   </div>
 
@@ -966,7 +980,10 @@ const handleAddMember = async (e) => {
                     <select
                       value={newMember.blood_group}
                       onChange={(e) =>
-                        setNewMember({ ...newMember, blood_group: e.target.value })
+                        setNewMember({
+                          ...newMember,
+                          blood_group: e.target.value,
+                        })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     >
@@ -990,7 +1007,10 @@ const handleAddMember = async (e) => {
                       type="number"
                       value={newMember.years_experience}
                       onChange={(e) =>
-                        setNewMember({ ...newMember, years_experience: parseInt(e.target.value) || 0 })
+                        setNewMember({
+                          ...newMember,
+                          years_experience: parseInt(e.target.value) || 0,
+                        })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       min="0"
@@ -1005,7 +1025,10 @@ const handleAddMember = async (e) => {
                       type="number"
                       value={newMember.rating}
                       onChange={(e) =>
-                        setNewMember({ ...newMember, rating: parseFloat(e.target.value) || 0 })
+                        setNewMember({
+                          ...newMember,
+                          rating: parseFloat(e.target.value) || 0,
+                        })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       min="0"
@@ -1022,7 +1045,10 @@ const handleAddMember = async (e) => {
                       type="number"
                       value={newMember.projects_completed}
                       onChange={(e) =>
-                        setNewMember({ ...newMember, projects_completed: parseInt(e.target.value) || 0 })
+                        setNewMember({
+                          ...newMember,
+                          projects_completed: parseInt(e.target.value) || 0,
+                        })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       min="0"
