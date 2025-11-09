@@ -3,7 +3,6 @@ import { Mail, Phone, MapPin, ExternalLink } from 'lucide-react';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
-
   return (
     <footer className="bg-slate-900 text-white relative overflow-hidden">
       {/* Simple background gradient */}
@@ -63,7 +62,7 @@ function Footer() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3 text-gray-400">
                   <MapPin className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                  <span className="text-sm">Lagos, Nigeria</span>
+                  <span className="text-sm">Ifo, Ogun State, Nigeria.</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-400">
                   <Phone className="w-4 h-4 text-emerald-400 flex-shrink-0" />
