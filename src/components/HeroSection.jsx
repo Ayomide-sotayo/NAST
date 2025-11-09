@@ -66,7 +66,8 @@ const HeroSection = () => {
                     OF SURVEY TECHNICIANS
                   </span>
                   <span className="block text-xl sm:text-2xl md:text-3xl text-white/95 mt-4 md:mt-6 tracking-wider font-semibold">
-                    N.A.S.T IFO ZONE
+                    N.A.S.T IFO ZONE <br />
+                    MOTTO : Prospect Through Labour
                   </span>
                 </h1>
               </div>
