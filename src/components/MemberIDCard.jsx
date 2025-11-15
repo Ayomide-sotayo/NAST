@@ -4,7 +4,7 @@ import logo from "../assets/logo.png";
 const MemberIDCard = ({ member }) => {
   return (
     <div
-      className="w-[90mm] h-[120mm] bg-white rounded-2xl shadow-2xl overflow-hidden relative"
+      className="w-[90mm] h-[130mm] bg-white rounded-2xl shadow-2xl overflow-hidden relative"
       style={{ fontFamily: "Poppins, sans-serif" }}
     >
       {/* Background Image */}

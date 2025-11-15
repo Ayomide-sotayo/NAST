@@ -53,7 +53,7 @@ const HeroSection = () => {
               {/* Floating Badge */}
               <div className="inline-flex items-center px-4 py-2 bg-emerald-500/15 backdrop-blur-sm rounded-full border border-emerald-400/30 text-emerald-300 text-sm font-medium animate-float mx-auto lg:mx-0">
                 <span className="w-2 h-2 bg-emerald-400 rounded-full mr-2 animate-pulse"></span>
-                Excellence in Surveying Since 1987
+                Excellence in Surveying Since 1989
               </div>
 
               {/* Main Title */}

@@ -19,10 +19,10 @@ const StatsSection = () => {
     },
     {
       icon: Calendar,
-      number: 38,
+      number: 35,
       suffix: "+",
       label: "Years Experience",
-      description: "Excellence in surveying since 1987",
+      description: "Excellence in surveying since 1989",
       color: "from-green-400 to-lime-500",
       solidColor: "#22c55e",
       bgColor: "#f0fdf4",

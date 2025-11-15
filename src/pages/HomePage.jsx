@@ -28,7 +28,7 @@ function HomePage() {
                 </span>
               </h2>
               <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-                Founded in 1987, the Surveyor Association of Nigeria stands as
+                Founded in 1989, the Surveyor Association of Nigeria stands as
                 the premier organization dedicated to advancing the surveying
                 profession across the nation. With over 1000 skilled members, we
                 deliver accurate land measurements, innovative solutions, and

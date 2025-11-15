@@ -102,9 +102,8 @@ function ContactPage() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Visit Our Office</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  24 Surveyors Way<br />
-                  Ifo, Ogun State<br />
-                  Nigeria
+                  Km 4, Along Ibogun/Ifo Road, S.I.A Bus Stop, Oko-Ireke, Ifo
+                    Ogun State
                 </p>
               </div>
 
@@ -114,7 +113,7 @@ function ContactPage() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Call Us</h3>
                 <p className="text-slate-600 leading-relaxed">
-                  +234 812 345 6789<br />
+                  +234 803 392 9146<br />
                   Mon - Fri: 8:00 AM - 5:00 PM
                 </p>
               </div>
