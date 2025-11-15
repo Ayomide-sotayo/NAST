@@ -86,7 +86,7 @@ function Footer() {
         <div className="border-t border-slate-800 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <p className="text-gray-500 text-sm">
-              © {currentYear} Nigerian Association of Surveying Technologists.
+              © {currentYear} Nigerian Association of Survey technicians.
               All rights reserved.
             </p>
             <div className="flex items-center space-x-6 text-sm">

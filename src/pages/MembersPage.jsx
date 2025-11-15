@@ -304,7 +304,7 @@ function MembersPage() {
                   {/* License Info */}
                   <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-4 mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-medium text-gray-500">License Number</span>
+                      <span className="text-xs font-medium text-gray-500">Cert No.</span>
                       <span className="text-xs font-medium text-gray-500">Valid Until</span>
                     </div>
                     <div className="flex justify-between items-center">
@@ -317,15 +317,7 @@ function MembersPage() {
                     </div>
                   </div>
 
-                  {/* Blood Group (if available) */}
-                  {member.blood_group && (
-                    <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-3 mb-4">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs font-medium text-gray-500">Blood Group</span>
-                        <span className="text-sm font-bold text-red-600">{member.blood_group}</span>
-                      </div>
-                    </div>
-                  )}
+                  
 
                   {/* Action Buttons */}
                   <div className="flex space-x-2">
