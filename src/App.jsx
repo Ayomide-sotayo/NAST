@@ -4,10 +4,11 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
+import MemberDetailPage from './pages/MemberDetailPage'; // NEW IMPORT
 import ContactPage from './pages/ContactPage';
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboard from './pages/admin/AdminPage.jsx';
-import { supabase } from './supabaseClient'; // Make sure this path is correct
+import { supabase } from './supabaseClient';
 
 // Protected Route Component
 function ProtectedRoute({ children, isAuthenticated }) {
@@ -64,7 +65,6 @@ function App() {
     
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      // eslint-disable-next-line no-unused-vars
       (event, session) => {
         if (event === 'SIGNED_IN') {
           setIsAuthenticated(true);
@@ -139,6 +139,19 @@ function App() {
             </>
           }
         />
+        
+        {/* NEW ROUTE: Individual Member Detail Page */}
+        <Route
+          path="/member/:id"
+          element={
+            <>
+              <Navbar />
+              <MemberDetailPage />
+              <Footer />
+            </>
+          }
+        />
+        
         <Route
           path="/contact"
           element={
