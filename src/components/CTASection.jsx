@@ -123,7 +123,7 @@ const CTASection = () => {
             isVisible ? 'animate-fade-in-up' : 'opacity-0'
           }`}>
             <a
-              href="/contact"
+              href="/register"
               className="group relative px-10 py-5 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 transform hover:-translate-y-2 hover:scale-105 overflow-hidden"
             >
               <span className="relative z-10 flex items-center">

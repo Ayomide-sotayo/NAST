@@ -4,8 +4,9 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
-import MemberDetailPage from './pages/MemberDetailPage'; // NEW IMPORT
+import MemberDetailPage from './pages/MemberDetailPage';
 import ContactPage from './pages/ContactPage';
+import RegistrationPage from './pages/RegistrationPage'; // NEW IMPORT
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboard from './pages/admin/AdminPage.jsx';
 import { supabase } from './supabaseClient';
@@ -140,13 +141,25 @@ function App() {
           }
         />
         
-        {/* NEW ROUTE: Individual Member Detail Page */}
+        {/* Individual Member Detail Page */}
         <Route
           path="/member/:id"
           element={
             <>
               <Navbar />
               <MemberDetailPage />
+              <Footer />
+            </>
+          }
+        />
+        
+        {/* NEW ROUTE: Registration Page */}
+        <Route
+          path="/register"
+          element={
+            <>
+              <Navbar />
+              <RegistrationPage />
               <Footer />
             </>
           }

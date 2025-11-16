@@ -87,7 +87,7 @@ const HeroSection = () => {
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 pt-4 md:pt-6 justify-center lg:justify-start">
                 <a
-                  href="/contact"
+                  href="/register"
                   className="group relative px-6 py-3 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold rounded-lg hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-emerald-500/30 transform hover:-translate-y-1 active:scale-95 flex items-center justify-center"
                 >
                   <span className="relative z-10">Join Our Community</span>

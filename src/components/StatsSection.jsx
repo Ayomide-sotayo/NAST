@@ -215,7 +215,7 @@ const StatsSection = () => {
         <div className="text-center px-4">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
             <a
-              href="/join"
+              href="/register"
               className="group relative w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
             >
               <span className="relative z-10 flex items-center justify-center text-base sm:text-lg">

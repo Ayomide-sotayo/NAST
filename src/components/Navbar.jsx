@@ -103,7 +103,7 @@ function Navbar() {
             {/* CTA Button - Desktop */}
             <div className="hidden lg:block">
               <Link
-                to="/contact"
+                to="/register"
                 className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold rounded-full hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 transform hover:-translate-y-0.5 hover:scale-105"
               >
                 Join Now
@@ -168,7 +168,7 @@ function Navbar() {
                 {/* Mobile CTA */}
                 <div className="pt-6 mt-4">
                   <Link
-                    to="/contact"
+                    to="/register"
                     onClick={closeMenu}
                     className="block w-full px-6 py-4 bg-gradient-to-r from-emerald-600 to-green-600 text-white font-bold text-center text-lg rounded-xl hover:from-emerald-500 hover:to-green-500 transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 transform hover:scale-105"
                   >
