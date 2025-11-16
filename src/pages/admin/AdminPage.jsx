@@ -39,16 +39,18 @@ function AdminDashboard({ onLogout }) {
   const fileInputRef = useRef(null);
 
   // New member form data
+  // New member form data
   const [newMember, setNewMember] = useState({
     name: "",
     email: "",
     phone: "",
     location: "",
-    role: "Junior Surveyor",
+    role: "Member",
     specialization: "",
     avatar: "",
     status: "Active",
     license_number: "",
+    cert_number: "",
     blood_group: "",
     years_experience: 0,
     rating: 0,
@@ -927,13 +929,35 @@ function AdminDashboard({ onLogout }) {
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     >
-                      <option value="Junior Surveyor">Junior Surveyor</option>
-                      <option value="Senior Surveyor">Senior Surveyor</option>
-                      <option value="Survey Tech">Survey Tech</option>
-                      <option value="Principal Surveyor">
-                        Principal Surveyor
+                      <option value="Member">Member</option>
+                      <option value="Elder">Elder</option>
+                      <option value="Semi Elder">Semi Elder</option>
+                      <option value="Chairman">Chairman</option>
+                      <option value="Vice Chairman 1">
+                        Vice Chairman 1
+                      </option>
+                      <option value="Vice Chairman 2">
+                        Vice Chairman 2
                       </option>
                       <option value="P.R.O 1">P.R.O 1</option>
+                      <option value="P.R.O 2">P.R.O 2</option>
+                      <option value="Treasurer">Treasurer</option>
+                      <option value="Secetary"> Secetary</option>
+                      <option value="Asst. Secetary">Asst.Secetary</option>
+                      <option value="Financial Secetary">Financial Secetary</option>
+                      <option value="Social Secetary"> Social Secetary</option>
+                      <option value="Auditor 1">Auditor 1</option>
+                      <option value="Auditor 2">Auditor 2</option>
+                      <option value="Chief Whip 1">Chief Whip 1</option>
+                      <option value="Chief Whip 2">Chief Whip 2</option>
+                      <option value="ANAST"> ANAST</option>
+                      <option value="MNAST"> MNAST</option>
+                      <option value="FNAST"> FNAST</option>
+                      <option value="X Officio"> X Officio</option>
+                      <option value="Patron"> Patron</option>
+                      <option value="Grand Patron">Grand Patron</option>
+                      <option value="Advicer">Advicer</option>
+                      <option value="Chief Advicer">Chief Advicer</option>
                     </select>
                   </div>
 
@@ -958,7 +982,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Status
+                     Active Status
                     </label>
                     <select
                       value={newMember.status}
@@ -970,6 +994,7 @@ function AdminDashboard({ onLogout }) {
                       <option value="Active">Active</option>
                       <option value="Training">Training</option>
                       <option value="Inactive">Inactive</option>
+                      <option value="Under Suspension">Under Suspension</option>
                     </select>
                   </div>
 
@@ -1044,6 +1069,24 @@ function AdminDashboard({ onLogout }) {
                     <input
                       type="number"
                       value={newMember.projects_completed}
+                      onChange={(e) =>
+                        setNewMember({
+                          ...newMember,
+                          projects_completed: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      min="0"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Cert Number
+                    </label>
+                    <input
+                      type="number"
+                      value={newMember.cert_number}
                       onChange={(e) =>
                         setNewMember({
                           ...newMember,
