@@ -162,7 +162,7 @@ function MembersPage() {
               </span>
             </h1>
             <p className="text-xl text-slate-200 max-w-2xl mx-auto leading-relaxed mb-4">
-              Nigeria Association of Surveyors & Topographers
+              Nigerian Association of Survey Technicians
             </p>
             <p className="text-sm text-emerald-300 font-medium">
               📋 {members.length} Certified Professionals • Connect with experts
