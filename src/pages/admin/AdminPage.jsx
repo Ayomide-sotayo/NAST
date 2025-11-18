@@ -1139,7 +1139,7 @@ function AdminDashboard({ onLogout }) {
 
         {/* ID Card Modal */}
         {showIdCard && (
-          <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+          <div className="absolute inset-0 flex items-center justify-center z-50 ">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
               <div className="p-6 border-b border-slate-200">
                 <div className="flex items-center justify-between">
