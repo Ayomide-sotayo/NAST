@@ -30,6 +30,7 @@ function AdminDashboard({ onLogout }) {
   const [idCardMember, setIdCardMember] = useState(null);
   const [members, setMembers] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imageFile, setImageFile] = useState(null);
@@ -61,6 +62,7 @@ function AdminDashboard({ onLogout }) {
   useEffect(() => {
     fetchMembers();
     fetchMessages();
+    fetchRegistrations();
   }, []);
 
   const fetchMembers = async () => {
@@ -83,7 +85,7 @@ function AdminDashboard({ onLogout }) {
 
   const fetchMessages = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error} = await supabase
         .from("contact_messages")
         .select("*")
         .order("created_at", { ascending: false });
@@ -92,6 +94,20 @@ function AdminDashboard({ onLogout }) {
       setMessages(data || []);
     } catch (error) {
       console.error("Error fetching messages:", error);
+    }
+  };
+
+  const fetchRegistrations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("registrations")
+        .select("*")
+        .order("submitted_at", { ascending: false });
+
+      if (error) throw error;
+      setRegistrations(data || []);
+    } catch (error) {
+      console.error("Error fetching registrations:", error);
     }
   };
 
@@ -416,6 +432,110 @@ function AdminDashboard({ onLogout }) {
     }
   };
 
+  // Approve registration and add to members
+  const handleApproveRegistration = async (registration) => {
+    if (!window.confirm(`Approve registration for ${registration.full_name}?`))
+      return;
+
+    try {
+      setUploading(true);
+      setError(null);
+
+      const memberId = generateMemberId();
+      
+      const memberData = {
+        id: memberId,
+        name: registration.full_name,
+        email: registration.email,
+        phone: registration.phone,
+        location: `${registration.city}, ${registration.state}`,
+        role: registration.membership_type === 'Associate' ? 'Member' : registration.membership_type,
+        specialization: registration.specialization,
+        avatar: registration.photo_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        status: "Active",
+        license_number: generateLicenseNumber(`${registration.city}, ${registration.state}`),
+        blood_group: registration.blood_group,
+        years_experience: parseInt(registration.years_experience) || 0,
+        rating: 0,
+        projects_completed: 0,
+        join_date: new Date().toISOString().split("T")[0],
+        created_at: new Date().toISOString(),
+      };
+
+      // Insert into members table
+      const { error: memberError } = await supabase
+        .from("members")
+        .insert([memberData]);
+
+      if (memberError) throw memberError;
+
+      // Update registration status
+      const { error: updateError } = await supabase
+        .from("registrations")
+        .update({ registration_status: "approved", approved_at: new Date().toISOString() })
+        .eq("id", registration.id);
+
+      if (updateError) throw updateError;
+
+      // Refresh data
+      await fetchMembers();
+      await fetchRegistrations();
+      
+      alert(`Registration approved! ${registration.full_name} is now a member with ID: ${memberId}`);
+    } catch (error) {
+      console.error("Error approving registration:", error);
+      alert("Error approving registration: " + error.message);
+      setError(error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // Reject registration
+  const handleRejectRegistration = async (registration) => {
+    const reason = window.prompt(`Reject registration for ${registration.full_name}?\n\nPlease provide a reason:`);
+    if (!reason) return;
+
+    try {
+      const { error } = await supabase
+        .from("registrations")
+        .update({ 
+          registration_status: "rejected", 
+          rejection_reason: reason,
+          rejected_at: new Date().toISOString() 
+        })
+        .eq("id", registration.id);
+
+      if (error) throw error;
+
+      await fetchRegistrations();
+      alert("Registration rejected successfully.");
+    } catch (error) {
+      console.error("Error rejecting registration:", error);
+      alert("Error rejecting registration: " + error.message);
+    }
+  };
+
+  // Delete registration
+  const handleDeleteRegistration = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this registration?"))
+      return;
+
+    try {
+      const { error } = await supabase
+        .from("registrations")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setRegistrations(registrations.filter((reg) => reg.id !== id));
+    } catch (error) {
+      console.error("Error deleting registration:", error);
+      alert("Error deleting registration: " + error.message);
+    }
+  };
+
   // Filter data
   const filteredMembers = members.filter(
     (member) =>
@@ -429,6 +549,17 @@ function AdminDashboard({ onLogout }) {
       msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredRegistrations = registrations.filter(
+    (reg) =>
+      reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      reg.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const pendingRegistrations = registrations.filter(
+    (reg) => reg.registration_status === "pending"
   );
 
   if (loading) {
@@ -486,6 +617,19 @@ function AdminDashboard({ onLogout }) {
           >
             <Users className="w-4 h-4" />
             <span>Members ({members.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab("registrations")}
+            className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all duration-200 ${
+              activeTab === "registrations"
+                ? "bg-white text-emerald-600 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <IdCard className="w-4 h-4" />
+            <span>
+              Registrations ({pendingRegistrations.length})
+            </span>
           </button>
           <button
             onClick={() => setActiveTab("messages")}
@@ -659,6 +803,219 @@ function AdminDashboard({ onLogout }) {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Registrations Tab */}
+        {activeTab === "registrations" && (
+          <div className="space-y-6">
+            {/* Registrations Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900">
+                  Member Registrations
+                </h2>
+                <p className="text-slate-600">
+                  Review and approve new membership applications
+                </p>
+              </div>
+              <div className="flex items-center space-x-2 text-sm text-emerald-600">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                <span>
+                  {pendingRegistrations.length} pending approval{pendingRegistrations.length !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="relative max-w-md">
+              <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search registrations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Registrations Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredRegistrations.map((registration) => (
+                <div
+                  key={registration.id}
+                  className={`bg-white rounded-2xl shadow-sm border transition-all duration-200 hover:shadow-md ${
+                    registration.registration_status === "pending"
+                      ? "border-emerald-200 bg-emerald-50/30"
+                      : registration.registration_status === "approved"
+                      ? "border-green-200 bg-green-50/30"
+                      : "border-red-200 bg-red-50/30"
+                  }`}
+                >
+                  <div className="p-6">
+                    {/* Header with photo and status */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center space-x-4">
+                        <img
+                          src={registration.photo_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"}
+                          alt={registration.full_name}
+                          className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
+                          onError={(e) => {
+                            e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                          }}
+                        />
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-900">
+                            {registration.full_name}
+                          </h3>
+                          <p className="text-sm text-slate-600">
+                            {registration.specialization}
+                          </p>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                          registration.registration_status === "pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : registration.registration_status === "approved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {registration.registration_status.charAt(0).toUpperCase() + 
+                         registration.registration_status.slice(1)}
+                      </span>
+                    </div>
+
+                    {/* Personal Information */}
+                    <div className="space-y-3 mb-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Email</p>
+                          <p className="text-sm font-medium text-slate-900">{registration.email}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Phone</p>
+                          <p className="text-sm font-medium text-slate-900">{registration.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Location</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {registration.city}, {registration.state}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500 mb-1">Blood Group</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {registration.blood_group || "N/A"}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Professional Details */}
+                      <div className="pt-3 border-t border-slate-200">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">Qualification</p>
+                            <p className="text-sm font-medium text-slate-900">
+                              {registration.qualification}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">Experience</p>
+                            <p className="text-sm font-medium text-slate-900">
+                              {registration.years_experience} years
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">Institution</p>
+                            <p className="text-sm font-medium text-slate-900">
+                              {registration.institution}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-slate-500 mb-1">Grad Year</p>
+                            <p className="text-sm font-medium text-slate-900">
+                              {registration.graduation_year}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Current Employment */}
+                      {registration.current_employer && (
+                        <div className="pt-3 border-t border-slate-200">
+                          <p className="text-xs text-slate-500 mb-1">Current Employment</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {registration.job_title} at {registration.current_employer}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Submission Date */}
+                      <div className="pt-3 border-t border-slate-200">
+                        <p className="text-xs text-slate-500">
+                          Submitted on{" "}
+                          {new Date(registration.submitted_at).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center space-x-2 pt-4 border-t border-slate-200">
+                      {registration.registration_status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleApproveRegistration(registration)}
+                            disabled={uploading}
+                            className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <Save className="w-4 h-4" />
+                            <span>{uploading ? "Processing..." : "Approve"}</span>
+                          </button>
+                          <button
+                            onClick={() => handleRejectRegistration(registration)}
+                            className="flex-1 flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-all duration-300"
+                          >
+                            <X className="w-4 h-4" />
+                            <span>Reject</span>
+                          </button>
+                        </>
+                      )}
+                      {registration.document_url && (
+                        <a
+                          href={registration.document_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2.5 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          title="View documents"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                      )}
+                      <button
+                        onClick={() => handleDeleteRegistration(registration.id)}
+                        className="p-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete registration"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {filteredRegistrations.length === 0 && (
+              <div className="text-center py-12">
+                <IdCard className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+                <p className="text-slate-500">No registrations found</p>
+              </div>
+            )}
           </div>
         )}
 
