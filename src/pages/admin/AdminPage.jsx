@@ -1352,6 +1352,7 @@ function AdminDashboard({ onLogout }) {
                       <option value="Training">Training</option>
                       <option value="Inactive">Inactive</option>
                       <option value="Under Suspension">Under Suspension</option>
+                      <option value="In Debt">In Debt</option>
                     </select>
                   </div>
 
