@@ -1284,7 +1284,7 @@ function AdminDashboard({ onLogout }) {
                       onChange={(e) =>
                         setNewMember({ ...newMember, role: e.target.value })
                       }
-                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent uppercase"
                     >
                       <option value="Member">Member</option>
                       <option value="Elder">Elder</option>
@@ -1315,6 +1315,7 @@ function AdminDashboard({ onLogout }) {
                       <option value="Grand Patron">Grand Patron</option>
                       <option value="Advicer">Advicer</option>
                       <option value="Chief Advicer">Chief Advicer</option>
+                      <option value="Apprentice">Apprentice</option>
                     </select>
                   </div>
 
@@ -1349,10 +1350,10 @@ function AdminDashboard({ onLogout }) {
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     >
                       <option value="Active">Active</option>
-                      <option value="Training">Training</option>
+                      <option value="Training">Apprentice</option>
                       <option value="Inactive">Inactive</option>
                       <option value="Under Suspension">Under Suspension</option>
-                      <option value="In Debt">In Debt</option>
+                      <option value="In Debt">Nast Debtor</option>
                     </select>
                   </div>
 

@@ -86,7 +86,7 @@ const MemberIDCard = ({ member }) => {
           </div>
           {/* Role */}
           <div className="text-center mb-2">
-            <div className="text-emerald-900 text-sm font-bold">
+            <div className="text-emerald-900 text-sm font-bold uppercase">
               {member.role || "SURV TECH."}
             </div>
           </div>
