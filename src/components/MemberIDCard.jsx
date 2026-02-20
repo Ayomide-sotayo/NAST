@@ -121,7 +121,7 @@ const MemberIDCard = ({ member }) => {
                 Cert. No.
               </div>
               <div className="text-emerald-900 text-sm font-medium">
-                {member.cert_number || "N/A"}
+                {member.cert_number || "U/P"}
               </div>
             </div>
           </div>
