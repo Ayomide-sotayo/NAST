@@ -70,7 +70,6 @@ const MemberIDCard = ({ member }) => {
       {/* Member Information Section */}
       <div className="relative z-10 px-4 pt-3 pb-4">
         <div className="bg-white rounded-xl shadow-lg border border-emerald-200 p-3">
-
           {/* Name */}
           <div className="text-center mb-2 border-b border-emerald-100 pb-2">
             <div className="text-emerald-800 text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">
@@ -94,7 +93,9 @@ const MemberIDCard = ({ member }) => {
               <Phone className="w-4 h-4 text-emerald-700" />
             </div>
             <div className="flex-1">
-              <div className="text-emerald-600 text-xs font-semibold">Phone</div>
+              <div className="text-emerald-600 text-xs font-semibold">
+                Phone
+              </div>
               <div className="text-emerald-900 text-sm font-medium">
                 {member.phone || "N/A"}
               </div>
@@ -116,13 +117,18 @@ const MemberIDCard = ({ member }) => {
               <Award className="w-4 h-4 text-emerald-700" />
             </div>
             <div className="flex-1">
-              <div className="text-emerald-600 text-xs font-semibold">Cert. No.</div>
+              <div className="text-emerald-600 text-xs font-semibold">
+                Cert. No.
+              </div>
               <div className="text-emerald-900 text-sm font-medium">
                 {member.cert_number || "N/A"}
               </div>
             </div>
           </div>
 
+          <div className="absolute bottom-8 right-8 text-green-600 text-sm font-mono">
+            {member.id}
+          </div>
         </div>
       </div>
 
