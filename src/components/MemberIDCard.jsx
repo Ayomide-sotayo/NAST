@@ -1,10 +1,11 @@
-import { Shield, Phone, Award, Briefcase, Star, MapPin } from "lucide-react";
+import { Phone, Award } from "lucide-react";
 import QRCodeSVG from "react-qr-code";
 import logo from "../assets/logo.png";
+
 const MemberIDCard = ({ member }) => {
   return (
     <div
-      className="w-[90mm] h-[150mm] bg-white rounded-2xl shadow-2xl overflow-hidden relative border-4 border-emerald-800"
+      className="w-[90mm] bg-white rounded-2xl shadow-2xl overflow-hidden relative border-4 border-emerald-800"
       style={{ fontFamily: "Poppins, sans-serif" }}
     >
       {/* Premium Background with subtle pattern */}
@@ -25,11 +26,9 @@ const MemberIDCard = ({ member }) => {
               <img
                 src={logo}
                 alt="NAST Logo"
-                className="w-20 h-20  object-contain"
+                className="w-20 h-20 object-contain"
               />
-              <div className="text-[10px] font-bold text-white">
-                RC.NO.5424
-              </div>
+              <div className="text-[10px] font-bold text-white">RC.NO.5424</div>
             </div>
             <div className="text-center">
               <div className="text-white text-[18px] font-bold leading-tight">
@@ -37,9 +36,7 @@ const MemberIDCard = ({ member }) => {
               </div>
               <div className="flex justify-center mb-2">
                 <div className="bg-gradient-to-r from-yellow-200 to-yellow-300 text-emerald-900 px-3 py-1 rounded-full shadow-md">
-                  <div className="text-sm tracking-wide">
-                     NAST IFO ZONE
-                  </div>
+                  <div className="text-sm tracking-wide">NAST IFO ZONE</div>
                 </div>
               </div>
               <div className="text-yellow-300 text-xs font-semibold italic tracking-wide">
@@ -51,10 +48,10 @@ const MemberIDCard = ({ member }) => {
       </div>
 
       {/* Member Photo Section */}
-      <div className="relative z-10 px-6 pt-6">
+      <div className="relative z-10 px-6 pt-4">
         <div className="flex justify-center">
           <div className="relative">
-            <div className="w-40 h-40 rounded-full border-4 border-emerald-600 shadow-lg overflow-hidden bg-white">
+            <div className="w-36 h-36 rounded-full border-4 border-emerald-600 shadow-lg overflow-hidden bg-white">
               <img
                 src={member.avatar}
                 alt={member.name}
@@ -65,70 +62,76 @@ const MemberIDCard = ({ member }) => {
                 }}
               />
             </div>
-            {/* Photo frame decoration */}
             <div className="absolute -inset-2 rounded-full border-2 border-yellow-400 opacity-50"></div>
           </div>
         </div>
       </div>
 
       {/* Member Information Section */}
-      <div className="relative z-10 px-6 pt-4">
-        {/* Member Details Card */}
-        <div className="bg-white rounded-xl shadow-lg border border-emerald-200 p-4 mb-4">
+      <div className="relative z-10 px-4 pt-3 pb-4">
+        <div className="bg-white rounded-xl shadow-lg border border-emerald-200 p-3">
+
           {/* Name */}
-          <div className="text-center mb-3 border-b border-emerald-100 pb-3">
+          <div className="text-center mb-2 border-b border-emerald-100 pb-2">
             <div className="text-emerald-800 text-xs font-semibold uppercase tracking-wider opacity-80 mb-1">
               Name
             </div>
-            <div className="text-emerald-900 text-md font-bold leading-tight">
+            <div className="text-emerald-900 text-sm font-bold leading-tight">
               SURV. TECH. {member.name || "OBIDAIRO PETER OLADIMEJI"}
             </div>
           </div>
+
           {/* Role */}
-          <div className="text-center mb-2">
+          <div className="text-center mb-2 border-b border-emerald-100 pb-2">
             <div className="text-emerald-900 text-sm font-bold uppercase">
               {member.role || "SURV TECH."}
             </div>
           </div>
 
-          {/* Contact Information */}
-          <div className="space-y-2">
-            <div className="flex items-center space-x-3">
-              <div className="bg-emerald-100 p-1 rounded-lg">
-                <Phone className="w-4 h-4 text-emerald-700" />
+          {/* Phone + QR Code row */}
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="bg-emerald-100 p-1 rounded-lg flex-shrink-0">
+              <Phone className="w-4 h-4 text-emerald-700" />
+            </div>
+            <div className="flex-1">
+              <div className="text-emerald-600 text-xs font-semibold">Phone</div>
+              <div className="text-emerald-900 text-sm font-medium">
+                {member.phone || "N/A"}
               </div>
-              <div className="flex-1">
-                <div className="text-emerald-600 text-xs font-semibold">
-                  Phone
-                </div>
-                <div className="text-emerald-900 text-sm font-medium">
-                  {member.phone || "08165414901"}
-                </div>
+            </div>
+            {member?.id && (
+              <div className="bg-white p-1.5 rounded-lg shadow border border-emerald-200 flex-shrink-0">
+                <QRCodeSVG
+                  value={`${window.location.origin}/member/${member.id}`}
+                  size={55}
+                  level="M"
+                />
               </div>
-              {/* Footer with QR Code */}
-              <div className="  px-6">
-                <div className="flex items-center justify-between">
-                  {/* QR Code */}
-                  {member?.id && (
-                    <div className="bg-white p-2 rounded-lg shadow-lg z-20 border border-emerald-200">
-                      <QRCodeSVG
-                        value={`${window.location.origin}/member/${member.id}`}
-                        size={60}
-                        level="M"
-                      />
-                    </div>
-                  )}
-                </div>
+            )}
+          </div>
+
+          {/* Cert Number row - always visible */}
+          <div className="flex items-center space-x-2">
+            <div className="bg-emerald-100 p-1 rounded-lg flex-shrink-0">
+              <Award className="w-4 h-4 text-emerald-700" />
+            </div>
+            <div className="flex-1">
+              <div className="text-emerald-600 text-xs font-semibold">Cert. No.</div>
+              <div className="text-emerald-900 text-sm font-medium">
+                {member.cert_number || "N/A"}
               </div>
             </div>
           </div>
+
         </div>
       </div>
 
+      {/* Bottom stripe */}
+      <div className="relative z-10 h-2 bg-gradient-to-r from-emerald-600 to-yellow-400"></div>
+
       {/* Decorative Elements */}
-      <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-600 to-yellow-400"></div>
       <div className="absolute top-20 right-4 w-8 h-8 bg-yellow-400 rounded-full opacity-20"></div>
-      <div className="absolute bottom-20 left-4 w-6 h-6 bg-emerald-400 rounded-full opacity-20"></div>
+      <div className="absolute bottom-10 left-4 w-6 h-6 bg-emerald-400 rounded-full opacity-20"></div>
     </div>
   );
 };

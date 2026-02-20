@@ -85,7 +85,7 @@ function AdminDashboard({ onLogout }) {
 
   const fetchMessages = async () => {
     try {
-      const { data, error} = await supabase
+      const { data, error } = await supabase
         .from("contact_messages")
         .select("*")
         .order("created_at", { ascending: false });
@@ -307,8 +307,8 @@ function AdminDashboard({ onLogout }) {
 
       setMembers(
         members.map((m) =>
-          m.id === editingMember.id ? { ...editingMember, ...updateData } : m
-        )
+          m.id === editingMember.id ? { ...editingMember, ...updateData } : m,
+        ),
       );
       resetForm();
       setEditingMember(null);
@@ -405,8 +405,8 @@ function AdminDashboard({ onLogout }) {
 
       setMessages(
         messages.map((msg) =>
-          msg.id === id ? { ...msg, status: "read" } : msg
-        )
+          msg.id === id ? { ...msg, status: "read" } : msg,
+        ),
       );
     } catch (error) {
       console.error("Error updating message:", error);
@@ -442,18 +442,25 @@ function AdminDashboard({ onLogout }) {
       setError(null);
 
       const memberId = generateMemberId();
-      
+
       const memberData = {
         id: memberId,
         name: registration.full_name,
         email: registration.email,
         phone: registration.phone,
         location: `${registration.city}, ${registration.state}`,
-        role: registration.membership_type === 'Associate' ? 'Member' : registration.membership_type,
+        role:
+          registration.membership_type === "Associate"
+            ? "Member"
+            : registration.membership_type,
         specialization: registration.specialization,
-        avatar: registration.photo_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+        avatar:
+          registration.photo_url ||
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
         status: "Active",
-        license_number: generateLicenseNumber(`${registration.city}, ${registration.state}`),
+        license_number: generateLicenseNumber(
+          `${registration.city}, ${registration.state}`,
+        ),
         blood_group: registration.blood_group,
         years_experience: parseInt(registration.years_experience) || 0,
         rating: 0,
@@ -472,7 +479,10 @@ function AdminDashboard({ onLogout }) {
       // Update registration status
       const { error: updateError } = await supabase
         .from("registrations")
-        .update({ registration_status: "approved", approved_at: new Date().toISOString() })
+        .update({
+          registration_status: "approved",
+          approved_at: new Date().toISOString(),
+        })
         .eq("id", registration.id);
 
       if (updateError) throw updateError;
@@ -480,8 +490,10 @@ function AdminDashboard({ onLogout }) {
       // Refresh data
       await fetchMembers();
       await fetchRegistrations();
-      
-      alert(`Registration approved! ${registration.full_name} is now a member with ID: ${memberId}`);
+
+      alert(
+        `Registration approved! ${registration.full_name} is now a member with ID: ${memberId}`,
+      );
     } catch (error) {
       console.error("Error approving registration:", error);
       alert("Error approving registration: " + error.message);
@@ -493,16 +505,18 @@ function AdminDashboard({ onLogout }) {
 
   // Reject registration
   const handleRejectRegistration = async (registration) => {
-    const reason = window.prompt(`Reject registration for ${registration.full_name}?\n\nPlease provide a reason:`);
+    const reason = window.prompt(
+      `Reject registration for ${registration.full_name}?\n\nPlease provide a reason:`,
+    );
     if (!reason) return;
 
     try {
       const { error } = await supabase
         .from("registrations")
-        .update({ 
-          registration_status: "rejected", 
+        .update({
+          registration_status: "rejected",
           rejection_reason: reason,
-          rejected_at: new Date().toISOString() 
+          rejected_at: new Date().toISOString(),
         })
         .eq("id", registration.id);
 
@@ -541,25 +555,25 @@ function AdminDashboard({ onLogout }) {
     (member) =>
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.id.toLowerCase().includes(searchTerm.toLowerCase())
+      member.id.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const filteredMessages = messages.filter(
     (msg) =>
       msg.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      msg.subject.toLowerCase().includes(searchTerm.toLowerCase())
+      msg.subject.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const filteredRegistrations = registrations.filter(
     (reg) =>
       reg.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       reg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      reg.specialization.toLowerCase().includes(searchTerm.toLowerCase())
+      reg.specialization.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const pendingRegistrations = registrations.filter(
-    (reg) => reg.registration_status === "pending"
+    (reg) => reg.registration_status === "pending",
   );
 
   if (loading) {
@@ -627,9 +641,7 @@ function AdminDashboard({ onLogout }) {
             }`}
           >
             <IdCard className="w-4 h-4" />
-            <span>
-              Registrations ({pendingRegistrations.length})
-            </span>
+            <span>Registrations ({pendingRegistrations.length})</span>
           </button>
           <button
             onClick={() => setActiveTab("messages")}
@@ -822,7 +834,8 @@ function AdminDashboard({ onLogout }) {
               <div className="flex items-center space-x-2 text-sm text-emerald-600">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span>
-                  {pendingRegistrations.length} pending approval{pendingRegistrations.length !== 1 ? 's' : ''}
+                  {pendingRegistrations.length} pending approval
+                  {pendingRegistrations.length !== 1 ? "s" : ""}
                 </span>
               </div>
             </div>
@@ -848,8 +861,8 @@ function AdminDashboard({ onLogout }) {
                     registration.registration_status === "pending"
                       ? "border-emerald-200 bg-emerald-50/30"
                       : registration.registration_status === "approved"
-                      ? "border-green-200 bg-green-50/30"
-                      : "border-red-200 bg-red-50/30"
+                        ? "border-green-200 bg-green-50/30"
+                        : "border-red-200 bg-red-50/30"
                   }`}
                 >
                   <div className="p-6">
@@ -857,11 +870,15 @@ function AdminDashboard({ onLogout }) {
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center space-x-4">
                         <img
-                          src={registration.photo_url || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"}
+                          src={
+                            registration.photo_url ||
+                            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                          }
                           alt={registration.full_name}
                           className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
                           onError={(e) => {
-                            e.target.src = "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
+                            e.target.src =
+                              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face";
                           }}
                         />
                         <div>
@@ -878,12 +895,14 @@ function AdminDashboard({ onLogout }) {
                           registration.registration_status === "pending"
                             ? "bg-yellow-100 text-yellow-800"
                             : registration.registration_status === "approved"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {registration.registration_status.charAt(0).toUpperCase() + 
-                         registration.registration_status.slice(1)}
+                        {registration.registration_status
+                          .charAt(0)
+                          .toUpperCase() +
+                          registration.registration_status.slice(1)}
                       </span>
                     </div>
 
@@ -892,20 +911,28 @@ function AdminDashboard({ onLogout }) {
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <p className="text-xs text-slate-500 mb-1">Email</p>
-                          <p className="text-sm font-medium text-slate-900">{registration.email}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {registration.email}
+                          </p>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500 mb-1">Phone</p>
-                          <p className="text-sm font-medium text-slate-900">{registration.phone}</p>
+                          <p className="text-sm font-medium text-slate-900">
+                            {registration.phone}
+                          </p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-500 mb-1">Location</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Location
+                          </p>
                           <p className="text-sm font-medium text-slate-900">
                             {registration.city}, {registration.state}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-slate-500 mb-1">Blood Group</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Blood Group
+                          </p>
                           <p className="text-sm font-medium text-slate-900">
                             {registration.blood_group || "N/A"}
                           </p>
@@ -916,25 +943,33 @@ function AdminDashboard({ onLogout }) {
                       <div className="pt-3 border-t border-slate-200">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Qualification</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Qualification
+                            </p>
                             <p className="text-sm font-medium text-slate-900">
                               {registration.qualification}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Experience</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Experience
+                            </p>
                             <p className="text-sm font-medium text-slate-900">
                               {registration.years_experience} years
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Institution</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Institution
+                            </p>
                             <p className="text-sm font-medium text-slate-900">
                               {registration.institution}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-slate-500 mb-1">Grad Year</p>
+                            <p className="text-xs text-slate-500 mb-1">
+                              Grad Year
+                            </p>
                             <p className="text-sm font-medium text-slate-900">
                               {registration.graduation_year}
                             </p>
@@ -945,9 +980,12 @@ function AdminDashboard({ onLogout }) {
                       {/* Current Employment */}
                       {registration.current_employer && (
                         <div className="pt-3 border-t border-slate-200">
-                          <p className="text-xs text-slate-500 mb-1">Current Employment</p>
+                          <p className="text-xs text-slate-500 mb-1">
+                            Current Employment
+                          </p>
                           <p className="text-sm font-medium text-slate-900">
-                            {registration.job_title} at {registration.current_employer}
+                            {registration.job_title} at{" "}
+                            {registration.current_employer}
                           </p>
                         </div>
                       )}
@@ -956,7 +994,9 @@ function AdminDashboard({ onLogout }) {
                       <div className="pt-3 border-t border-slate-200">
                         <p className="text-xs text-slate-500">
                           Submitted on{" "}
-                          {new Date(registration.submitted_at).toLocaleDateString("en-US", {
+                          {new Date(
+                            registration.submitted_at,
+                          ).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
@@ -970,15 +1010,21 @@ function AdminDashboard({ onLogout }) {
                       {registration.registration_status === "pending" && (
                         <>
                           <button
-                            onClick={() => handleApproveRegistration(registration)}
+                            onClick={() =>
+                              handleApproveRegistration(registration)
+                            }
                             disabled={uploading}
                             className="flex-1 flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white px-4 py-2.5 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <Save className="w-4 h-4" />
-                            <span>{uploading ? "Processing..." : "Approve"}</span>
+                            <span>
+                              {uploading ? "Processing..." : "Approve"}
+                            </span>
                           </button>
                           <button
-                            onClick={() => handleRejectRegistration(registration)}
+                            onClick={() =>
+                              handleRejectRegistration(registration)
+                            }
                             className="flex-1 flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg transition-all duration-300"
                           >
                             <X className="w-4 h-4" />
@@ -998,7 +1044,9 @@ function AdminDashboard({ onLogout }) {
                         </a>
                       )}
                       <button
-                        onClick={() => handleDeleteRegistration(registration.id)}
+                        onClick={() =>
+                          handleDeleteRegistration(registration.id)
+                        }
                         className="p-2.5 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete registration"
                       >
@@ -1086,7 +1134,7 @@ function AdminDashboard({ onLogout }) {
                         </p>
                         <p className="text-sm text-slate-500">
                           {new Date(
-                            message.created_at || message.date
+                            message.created_at || message.date,
                           ).toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "long",
@@ -1279,44 +1327,15 @@ function AdminDashboard({ onLogout }) {
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
                       Professional Role
                     </label>
-                    <select
+                    <input
+                      type="text"
                       value={newMember.role}
                       onChange={(e) =>
                         setNewMember({ ...newMember, role: e.target.value })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent uppercase"
-                    >
-                      <option value="Member">Member</option>
-                      <option value="Elder">Elder</option>
-                      <option value="Semi Elder">Semi Elder</option>
-                      <option value="Chairman">Chairman</option>
-                      <option value="Vice Chairman 1">
-                        Vice Chairman 1
-                      </option>
-                      <option value="Vice Chairman 2">
-                        Vice Chairman 2
-                      </option>
-                      <option value="P.R.O 1">P.R.O 1</option>
-                      <option value="P.R.O 2">P.R.O 2</option>
-                      <option value="Treasurer">Treasurer</option>
-                      <option value="Secetary"> Secetary</option>
-                      <option value="Asst. Secetary">Asst.Secetary</option>
-                      <option value="Financial Secetary">Financial Secetary</option>
-                      <option value="Social Secetary"> Social Secetary</option>
-                      <option value="Auditor 1">Auditor 1</option>
-                      <option value="Auditor 2">Auditor 2</option>
-                      <option value="Chief Whip 1">Chief Whip 1</option>
-                      <option value="Chief Whip 2">Chief Whip 2</option>
-                      <option value="ANAST"> ANAST</option>
-                      <option value="MNAST"> MNAST</option>
-                      <option value="FNAST"> FNAST</option>
-                      <option value="X Officio"> X Officio</option>
-                      <option value="Patron"> Patron</option>
-                      <option value="Grand Patron">Grand Patron</option>
-                      <option value="Advicer">Advicer</option>
-                      <option value="Chief Advicer">Chief Advicer</option>
-                      <option value="Apprentice">Apprentice</option>
-                    </select>
+                      placeholder="e.g. Chairman, Elder, Member..."
+                    />
                   </div>
 
                   <div>
@@ -1340,7 +1359,7 @@ function AdminDashboard({ onLogout }) {
 
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                     Active Status
+                      Active Status
                     </label>
                     <select
                       value={newMember.status}
@@ -1444,12 +1463,13 @@ function AdminDashboard({ onLogout }) {
                       Cert Number
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       value={newMember.cert_number}
+                      // ✅ CORRECT
                       onChange={(e) =>
                         setNewMember({
                           ...newMember,
-                          projects_completed: parseInt(e.target.value) || 0,
+                          cert_number: e.target.value,
                         })
                       }
                       className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
