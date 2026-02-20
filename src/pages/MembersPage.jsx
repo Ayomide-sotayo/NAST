@@ -28,7 +28,7 @@ function MembersPage() {
       const { data, error } = await supabase
         .from("members")
         .select("*")
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true });
 
       if (error) throw error;
       setMembers(data || []);
@@ -72,35 +72,6 @@ function MembersPage() {
     if (!dateString) return "N/A";
     const options = { year: "numeric", month: "short", day: "2-digit" };
     return new Date(dateString).toLocaleDateString("en-GB", options);
-  };
-
-  // Generate stars for rating
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <Star
-          key="half"
-          className="w-4 h-4 fill-yellow-400/50 text-yellow-400"
-        />
-      );
-    }
-
-    const remainingStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(<Star key={`empty-${i}`} className="w-4 h-4 text-gray-300" />);
-    }
-
-    return stars;
   };
 
   if (loading) {
@@ -249,7 +220,7 @@ function MembersPage() {
                   <div className="absolute top-4 left-4 flex items-center space-x-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(
-                        member.status
+                        member.status,
                       )}`}
                     >
                       {member.status || "Active"}
@@ -299,12 +270,13 @@ function MembersPage() {
                       {member.specialization}
                     </p>
 
-                    {/* Rating */}
+                    {/* Role */}
                     <div className="flex items-center justify-center space-x-1 mb-2">
-                      {renderStars(member.rating || 0)}
-                      <span className="text-sm text-gray-600 ml-2">
-                        ({member.rating || 0})
-                      </span>
+                      <div className="text-center mb-2 border-b border-emerald-100 pb-2">
+                        <div className="text-emerald-900 text-sm font-bold uppercase">
+                          {member.role || "SURV TECH."}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -314,7 +286,7 @@ function MembersPage() {
                       <div className="bg-blue-50 rounded-lg p-3">
                         <Calendar className="w-5 h-5 text-blue-600 mx-auto mb-1" />
                         <p className="text-sm font-bold text-blue-600">
-                          {member.years_experience || 0}
+                          {member.years_experience || 0} +
                         </p>
                         <p className="text-xs text-blue-500">Years Exp</p>
                       </div>
@@ -323,7 +295,7 @@ function MembersPage() {
                       <div className="bg-purple-50 rounded-lg p-3">
                         <Award className="w-5 h-5 text-purple-600 mx-auto mb-1" />
                         <p className="text-sm font-bold text-purple-600">
-                          {member.projects_completed || 0}
+                          {member.projects_completed || 0} +
                         </p>
                         <p className="text-xs text-purple-500">Projects</p>
                       </div>
@@ -367,12 +339,12 @@ function MembersPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-mono text-sm font-bold text-emerald-900">
-                        {member.cert_number || "Not assigned"}
+                        {member.cert_number || "N/A"}
                       </span>
                       <span className="text-sm font-semibold text-red-600">
                         {formatDate(
                           member.expiry_date ||
-                            new Date(new Date().getFullYear() + 2, 11, 31)
+                            new Date(new Date().getFullYear() + 2, 11, 31),
                         )}
                       </span>
                     </div>
