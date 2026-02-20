@@ -40,32 +40,7 @@ function MemberDetailPage() {
     return new Date(dateString).toLocaleDateString("en-GB", options);
   };
 
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <Star key="half" className="w-5 h-5 fill-yellow-400/50 text-yellow-400" />
-      );
-    }
-
-    const remainingStars = 5 - Math.ceil(rating);
-    for (let i = 0; i < remainingStars; i++) {
-      stars.push(
-        <Star key={`empty-${i}`} className="w-5 h-5 text-gray-300" />
-      );
-    }
-
-    return stars;
-  };
+ 
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -180,14 +155,8 @@ function MemberDetailPage() {
                 </div>
               </div>
 
-              {/* Rating */}
-              <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/20">
-                <h3 className="text-lg font-bold text-slate-800 mb-4">Rating</h3>
-                <div className="flex items-center justify-center space-x-1 mb-2">
-                  {renderStars(member.rating || 0)}
-                </div>
-                <p className="text-center text-2xl font-bold text-slate-800">{member.rating || 0}/5</p>
-              </div>
+             
+              
             </div>
 
             {/* Right Column - Detailed Information */}
@@ -249,18 +218,13 @@ function MemberDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div className="bg-blue-50 rounded-xl p-4 text-center">
                     <Calendar className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-blue-600 mb-1">{member.years_experience || 0}</p>
+                    <p className="text-2xl font-bold text-blue-600 mb-1">{member.years_experience || 0} +</p>
                     <p className="text-sm text-blue-500 font-medium">Years Experience</p>
                   </div>
                   <div className="bg-purple-50 rounded-xl p-4 text-center">
                     <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-purple-600 mb-1">{member.projects_completed || 0}</p>
+                    <p className="text-2xl font-bold text-purple-600 mb-1">{member.projects_completed || 0} +</p>
                     <p className="text-sm text-purple-500 font-medium">Projects Completed</p>
-                  </div>
-                  <div className="bg-green-50 rounded-xl p-4 text-center">
-                    <Star className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                    <p className="text-2xl font-bold text-green-600 mb-1">{member.rating || 0}</p>
-                    <p className="text-sm text-green-500 font-medium">Rating</p>
                   </div>
                 </div>
 
