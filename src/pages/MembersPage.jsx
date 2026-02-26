@@ -339,7 +339,7 @@ function MembersPage() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-mono text-sm font-bold text-emerald-900">
-                        {member.cert_number || "N/A"}
+                        {member.cert_number || "U/P"}
                       </span>
                       <span className="text-sm font-semibold text-red-600">
                         {formatDate(

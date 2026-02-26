@@ -249,7 +249,7 @@ function MemberDetailPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="text-sm font-semibold text-gray-600 mb-1 block">License Number</label>
-                    <p className="font-mono text-xl font-bold text-slate-800">{member.license_number || 'Not assigned'}</p>
+                    <p className="font-mono text-xl font-bold text-slate-800">{member.license_number || 'Under Processing'}</p>
                   </div>
                   <div>
                     <label className="text-sm font-semibold text-gray-600 mb-1 block">Valid Until</label>
